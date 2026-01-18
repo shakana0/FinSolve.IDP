@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="FinSolve.IDP.Application/FinSolve.IDP.Application.csproj" />
+  <Project Path="FinSolve.IDP.Domain/FinSolve.IDP.Domain.csproj" />
+  <Project Path="FinSolve.IDP.Functions/FinSolve.IDP.Functions.csproj" />
+  <Project Path="FinSolve.IDP.Infrastructure/FinSolve.IDP.Infrastructure.csproj" />
+  <Project Path="FinSolve.IDP.Tests/FinSolve.IDP.Tests.csproj" />
+</Solution>
