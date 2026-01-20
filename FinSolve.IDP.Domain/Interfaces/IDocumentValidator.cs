@@ -5,6 +5,6 @@ namespace FinSolve.IDP.Domain.Interfaces
 {
     public interface IDocumentValidator
     {
-        ValidationResult Validate(Document document, string content);
+        ValidationResult Validate(Metadata metadata, string content);
     }
 }
