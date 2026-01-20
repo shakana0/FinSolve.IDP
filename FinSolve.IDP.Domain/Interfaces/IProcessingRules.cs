@@ -4,6 +4,6 @@ namespace FinSolve.IDP.Domain.Interfaces
 {
     public interface IProcessingRules
     {
-        Task<ProcessingResult> ApplyAsync(Document document, string content);
+        Task<ProcessingResult> ApplyAsync(Metadata metadata, string content);
     }
 }
