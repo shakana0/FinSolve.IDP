@@ -35,5 +35,15 @@ namespace FinSolve.IDP.Infrastructure.Blob
 
             return blobClient.Uri.ToString();
         }
+
+        public async Task<byte[]> DownloadAsync(string blobPath)
+        {
+            var client = _container.GetBlobClient(blobPath);
+
+            using var ms = new MemoryStream();
+            await client.DownloadToAsync(ms);
+            return ms.ToArray();
+        }
+
     }
 }
