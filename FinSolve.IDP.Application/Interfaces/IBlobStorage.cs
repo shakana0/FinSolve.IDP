@@ -6,5 +6,6 @@
             string blobName,
             byte[] content,
             IDictionary<string, string> metadata);
+        Task<byte[]> DownloadAsync(string blobPath);
     }
 }
