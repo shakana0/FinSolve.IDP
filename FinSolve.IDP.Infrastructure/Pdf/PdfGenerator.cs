@@ -1,28 +1,28 @@
 ﻿using FinSolve.IDP.Application.Interfaces;
+using FinSolve.IDP.Domain.Entities;
 using QuestPDF.Fluent;
-using QuestPDF.Helpers;
+using Document = QuestPDF.Fluent.Document;
 
 namespace FinSolve.IDP.Infrastructure.Pdf
 {
-    public class PdfGenerator : IPdfGenerator
+    public class QuestPdfGenerator : IPdfGenerator
     {
-        public byte[] GeneratePdf(string title, string content)
+        public byte[] Generate(ProcessingResult result)
         {
             var document = Document.Create(container =>
             {
                 container.Page(page =>
                 {
                     page.Margin(40);
-                    page.Size(PageSizes.A4);
-                    page.DefaultTextStyle(x => x.FontSize(12));
-
-                    page.Header().Text(title).FontSize(18).Bold().AlignCenter();
-                    page.Content().PaddingVertical(10).Text(content);
-                    page.Footer().AlignCenter().Text(x =>
+                    page.Content().Column(col =>
                     {
-                        x.CurrentPageNumber();
-                        x.Span(" / ");
-                        x.TotalPages();
+                        col.Item().Text($"Document ID: {result.DocumentId.Value}");
+                        col.Item().Text($"Category: {result.PrimaryCategory}");
+                        col.Item().Text("Items:");
+                        foreach (var item in result.Items)
+                            col.Item().Text($"- {item}");
+                        col.Item().Text("Summary:");
+                        col.Item().Text(result.Summary);
                     });
                 });
             });
