@@ -1,9 +1,12 @@
-﻿using FinSolve.IDP.Application.DTOs;
+﻿
+using FinSolve.IDP.Domain.Entities;
+using FinSolve.IDP.Domain.ValueObjects;
 
 namespace FinSolve.IDP.Application.Interfaces
 {
     public interface IProcessingResultRepository
     {
-        Task SaveAsync(ProcessingResultCosmosDto dto);
+        Task<ProcessingResult?> GetAsync(DocumentId documentId);
+        Task SaveAsync(ProcessingResult result);
     }
 }
