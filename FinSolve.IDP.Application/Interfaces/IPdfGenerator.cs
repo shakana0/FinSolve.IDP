@@ -1,7 +1,9 @@
-﻿namespace FinSolve.IDP.Application.Interfaces
+﻿using FinSolve.IDP.Domain.Entities;
+
+namespace FinSolve.IDP.Application.Interfaces
 {
     public interface IPdfGenerator
     {
-        byte[] GeneratePdf(string title, string content);
+        byte[] Generate(ProcessingResult result);
     }
 }
