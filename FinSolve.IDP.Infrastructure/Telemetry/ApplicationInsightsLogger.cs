@@ -2,7 +2,7 @@
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.DataContracts;
 
-namespace FinSolve.IDP.Infrastructure.Logging
+namespace FinSolve.IDP.Infrastructure.Telemetry
 {
     public class ApplicationInsightsLogger : ILoggingAdapter
     {
