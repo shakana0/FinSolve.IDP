@@ -24,7 +24,7 @@ public class SummaryGeneratorFunction
 
     [Function("SummaryGenerator")]
     public async Task RunAsync(
-        [ServiceBusTrigger("summary-generator", Connection = "ServiceBusConnection")]
+        [ServiceBusTrigger("idp-documents", "processing-completed", Connection = "ServiceBusConnection")]
         string message)
     {
         _logger.LogInformation("SummaryGeneratorFunction triggered");
@@ -51,7 +51,7 @@ public class SummaryGeneratorFunction
         await _resultRepository.SaveAsync(updated);
         _logger.LogInformation("Updated processing result saved");
 
-        await _publisher.PublishAsync("pdf-generator", metadata);
+        await _publisher.PublishAsync("idp-documents", metadata, "SummaryCreated");
         _logger.LogInformation("Published event to PdfGenerator");
 
         _logger.LogInformation("SummaryGenerator completed successfully");
