@@ -1,10 +1,13 @@
-﻿namespace FinSolve.IDP.Tests;
+﻿using Xunit;
 
-public class UnitTest1
+namespace FinSolve.IDP.Tests
 {
-    [Fact]
-    public void Test1()
+    public class SmokeTests
     {
-
+        [Fact]
+        public void AlwaysPasses()
+        {
+            Assert.True(true);
+        }
     }
 }
