@@ -27,7 +27,7 @@ public class PdfGeneratorFunction
 
     [Function("PdfGenerator")]
     public async Task RunAsync(
-        [ServiceBusTrigger("pdf-generator", Connection = "ServiceBusConnection")]
+        [ServiceBusTrigger("idp-documents", "summary-created", Connection = "ServiceBusConnection")]
         string message)
     {
         _logger.LogInformation("PdfGeneratorFunction triggered");
@@ -60,11 +60,11 @@ public class PdfGeneratorFunction
 
         _logger.LogInformation("PDF uploaded to Blob Storage");
 
-        await _publisher.PublishAsync("finalization", new PdfMetadataDto
+        await _publisher.PublishAsync("idp-documents", new PdfMetadataDto
         {
             DocumentId = result.DocumentId.Value.ToString(),
             PdfBlobPath = pdfBlobPath
-        });
+        }, "PdfGenerated");
 
         _logger.LogInformation("Published event to Finalization");
         _logger.LogInformation("PdfGenerator completed successfully");
