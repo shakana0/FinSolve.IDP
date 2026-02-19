@@ -39,17 +39,23 @@ namespace FinSolve.IDP.Application.Services.DocumentMetadata
             if (string.IsNullOrWhiteSpace(content))
                 throw new InvalidDocumentException("Document content is empty.");
 
-            var metadata = await _metadataExtractor.ExtractAsync(content);
+            var extracted = await _metadataExtractor.ExtractAsync(content);
 
-            if (metadata == null)
+            if (extracted == null)
                 throw new MetadataExtractionException("Failed to extract metadata.");
 
-            var validation = _validator.Validate(metadata, content);
+            var validation = _validator.Validate(extracted, content);
 
             if (!validation.IsValid)
                 throw new InvalidDocumentException(string.Join("; ", validation.Errors));
 
-            return metadata;
+            return new Metadata(
+              extracted.Title,
+              extracted.Author,
+              extracted.CreatedDate,
+              extracted.CustomFields,
+              type                  
+          );
         }
     }
 }
