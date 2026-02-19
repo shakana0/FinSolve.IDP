@@ -27,7 +27,7 @@ public class HeavyProcessingFunction
 
     [Function("HeavyProcessing")]
     public async Task RunAsync(
-        [ServiceBusTrigger("heavy-processing", Connection = "ServiceBusConnection")]
+        [ServiceBusTrigger("idp-documents", "metadata-validated", Connection = "ServiceBusConnection")]
         string message)
     {
         _logger.LogInformation("HeavyProcessingFunction triggered");
@@ -53,9 +53,9 @@ public class HeavyProcessingFunction
         await _resultRepository.SaveAsync(result);
         _logger.LogInformation("Processing result saved");
 
-        // 5. Publish event to next step (PdfGenerator)
-        await _publisher.PublishAsync("pdf-generator", metadata);
-        _logger.LogInformation("Published event to PdfGenerator");
+        // 5. Publish event to next step (SummaryGenerator)
+        await _publisher.PublishAsync("idp-documents", metadata, "ProcessingCompleted");
+        _logger.LogInformation("Published event to SummaryGenerator");
 
         _logger.LogInformation("HeavyProcessing completed successfully");
     }
