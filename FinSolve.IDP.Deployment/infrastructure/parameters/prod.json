@@ -1,0 +1,5 @@
+{
+  "environment": "prod",
+  "prefix": "idpprod",
+  "location": "westeurope"
+}
