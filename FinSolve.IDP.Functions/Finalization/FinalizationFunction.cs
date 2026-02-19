@@ -23,7 +23,7 @@ public class FinalizationFunction
 
     [Function("FinalizationFunction")]
     public async Task RunAsync(
-        [ServiceBusTrigger("finalization", Connection = "ServiceBusConnection")]
+        [ServiceBusTrigger("idp-documents", "pdf-generated", Connection = "ServiceBusConnection")]
         PdfMetadataDto metadata)
     {
         _logger.LogInformation($"Finalizing document {metadata.DocumentId}");
