@@ -1,6 +1,8 @@
 ﻿using System.Text.Json;
+using System.Security.Cryptography;
+using System.Text;
 
-namespace FinSolve.IDP.Application.DTOs 
+namespace FinSolve.IDP.Application.DTOs
 {
     public class DocumentMetadataDto
     {
@@ -25,9 +27,8 @@ namespace FinSolve.IDP.Application.DTOs
 
         public string GenerateHash()
         {
-            var raw = $"{DocumentId}-{FileName}-{UploadedAt:o}";
-            return Convert.ToBase64String(System.Security.Cryptography.SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(raw)));
+            var raw = $"{FileName}-{BlobPath}";
+            return Convert.ToBase64String(SHA256.HashData(Encoding.UTF8.GetBytes(raw)));
         }
     }
 }
-
