@@ -14,14 +14,14 @@ namespace FinSolve.IDP.Infrastructure.Messaging
             _client = client;
         }
 
-        public async Task PublishAsync(string topicName, object payload)
+        public async Task PublishAsync(string topicName, object payload, string subject)
         {
             var sender = _client.CreateSender(topicName);
-
             var json = JsonSerializer.Serialize(payload);
             var message = new ServiceBusMessage(Encoding.UTF8.GetBytes(json))
             {
-                ContentType = "application/json"
+                ContentType = "application/json",
+                Subject = subject
             };
 
             await sender.SendMessageAsync(message);
