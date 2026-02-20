@@ -130,11 +130,22 @@ resource functionApp 'Microsoft.Web/sites@2022-03-01' = {
 
 // --- ROLE-DEFINITIONS ---
 
-var roleDefinitionPrefix = '/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Authorization/roleDefinitions'
-var monitoringMetricsPublisherRoleID = '${roleDefinitionPrefix}/3913584d-2f98-4d3b-953e-7db0026df405'
-var serviceBusDataOwnerRoleID = '${roleDefinitionPrefix}/090c5cfd-751d-490a-8d92-f74d67c0738e'
-var storageAccountContributorRoleID = '${roleDefinitionPrefix}/17d1049b-9a84-46fb-8f53-86981c22a3f4'
-var storageBlobDataOwnerRoleID = '${roleDefinitionPrefix}/b7e69acd-9874-41da-b595-185d17e94d6a'
+var monitoringMetricsPublisherRoleID = subscriptionResourceId(
+  'Microsoft.Authorization/roleDefinitions',
+  '3913584d-2f98-4d3b-953e-7db0026df405'
+)
+var serviceBusDataOwnerRoleID = subscriptionResourceId(
+  'Microsoft.Authorization/roleDefinitions',
+  '090c5cfd-751d-490a-8d92-f74d67c0738e'
+)
+var storageAccountContributorRoleID = subscriptionResourceId(
+  'Microsoft.Authorization/roleDefinitions',
+  '17d1049b-9a84-46fb-8f53-86981c22a3f4'
+)
+var storageBlobDataOwnerRoleID = subscriptionResourceId(
+  'Microsoft.Authorization/roleDefinitions',
+  'b7e69acd-9874-41da-b595-185d17e94d6a'
+)
 var cosmosDataContributorRole = '00000000-0000-0000-0000-000000000002'
 
 // ---  ROLE ASSIGNMENTS ---
