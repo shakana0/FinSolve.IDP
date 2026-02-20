@@ -31,7 +31,7 @@ resource metadataValidatedRule 'Microsoft.ServiceBus/namespaces/topics/subscript
   properties: {
     filterType: 'SqlFilter'
     sqlFilter: {
-      sqlExpression: 'sys.Subject = \'MetadataValidated\''
+      sqlExpression: 'sys.Label = \'MetadataValidated\''
     }
   }
 }
@@ -52,7 +52,7 @@ resource processingCompletedRule 'Microsoft.ServiceBus/namespaces/topics/subscri
   properties: {
     filterType: 'SqlFilter'
     sqlFilter: {
-      sqlExpression: 'sys.Subject = \'ProcessingCompleted\''
+      sqlExpression: 'sys.Label = \'ProcessingCompleted\''
     }
   }
 }
@@ -73,7 +73,7 @@ resource summaryCreatedRule 'Microsoft.ServiceBus/namespaces/topics/subscription
   properties: {
     filterType: 'SqlFilter'
     sqlFilter: {
-      sqlExpression: 'sys.Subject = \'SummaryCreated\''
+      sqlExpression: 'sys.Label = \'SummaryCreated\''
     }
   }
 }
@@ -94,7 +94,7 @@ resource pdfGeneratedRule 'Microsoft.ServiceBus/namespaces/topics/subscriptions/
   properties: {
     filterType: 'SqlFilter'
     sqlFilter: {
-      sqlExpression: 'sys.Subject = \'PdfGenerated\''
+      sqlExpression: 'sys.Label = \'PdfGenerated\''
     }
   }
 }
