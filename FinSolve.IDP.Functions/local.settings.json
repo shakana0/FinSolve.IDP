@@ -3,8 +3,8 @@
   "Values": {
     "AzureWebJobsStorage": "UseDevelopmentStorage=true",
     "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
-    "KeyVaultUri": "https://ditt-keyvault.vault.azure.net/",
-    "CosmosDbAccountEndpoint": "https://din-cosmos.documents.azure.com:443/",
-    "StorageAccountName": "dinstorage"
+    "KeyVaultUri": "https://idpdevsj26-kv.vault.azure.net/",
+    "CosmosDbAccountEndpoint": "https://idpdevsj26-cosmos.documents.azure.com:443/",
+    "StorageAccountName": "idpdevsj26storage"
   }
 }
