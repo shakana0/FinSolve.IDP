@@ -130,18 +130,21 @@ resource functionApp 'Microsoft.Web/sites@2022-03-01' = {
 
 // --- ROLE-DEFINITIONS ---
 
-var monitoringMetricsPublisherRole = '3913584d-2f98-4d3b-953e-7db0026df405'
-var serviceBusDataOwnerRole = '090c5cfd-751d-490a-8d92-f74d67c0738e'
-var storageAccountContributorRole = '17d1049b-9a84-46fb-8f53-86981c22a3f4'
-var storageBlobDataOwnerRole = 'b7e69acd-9874-41da-b595-185d17e94d6a'
+var roleDefinitionPrefix = '/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Authorization/roleDefinitions'
+var monitoringMetricsPublisherRoleID = '${roleDefinitionPrefix}/3913584d-2f98-4d3b-953e-7db0026df405'
+var serviceBusDataOwnerRoleID = '${roleDefinitionPrefix}/090c5cfd-751d-490a-8d92-f74d67c0738e'
+var storageAccountContributorRoleID = '${roleDefinitionPrefix}/17d1049b-9a84-46fb-8f53-86981c22a3f4'
+var storageBlobDataOwnerRoleID = '${roleDefinitionPrefix}/b7e69acd-9874-41da-b595-185d17e94d6a'
 var cosmosDataContributorRole = '00000000-0000-0000-0000-000000000002'
 
-// 1. Give access to Application Insights (for metrics/loggar via identity)
+// ---  ROLE ASSIGNMENTS ---
+
+// 1. Application Insights
 resource appInsightsRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(appInsights.id, functionApp.id, monitoringMetricsPublisherRole)
+  name: guid(appInsights.id, functionApp.id, monitoringMetricsPublisherRoleID)
   scope: appInsights
   properties: {
-    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', monitoringMetricsPublisherRole)
+    roleDefinitionId: monitoringMetricsPublisherRoleID
     principalId: functionApp.identity.principalId
     principalType: 'ServicePrincipal'
   }
@@ -149,38 +152,38 @@ resource appInsightsRoleAssignment 'Microsoft.Authorization/roleAssignments@2022
 
 // 2. Service Bus
 resource sbAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(serviceBusNamespace.id, functionApp.id, serviceBusDataOwnerRole)
+  name: guid(serviceBusNamespace.id, functionApp.id, serviceBusDataOwnerRoleID)
   scope: serviceBusNamespace
   properties: {
-    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', serviceBusDataOwnerRole)
+    roleDefinitionId: serviceBusDataOwnerRoleID
     principalId: functionApp.identity.principalId
     principalType: 'ServicePrincipal'
   }
 }
 
-//AzureWebJobsStorage__credential = managedidentity
+// 3. Storage Account
 resource storageAccountAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(storageAccount.id, functionApp.id, storageAccountContributorRole)
+  name: guid(storageAccount.id, functionApp.id, storageAccountContributorRoleID)
   scope: storageAccount
   properties: {
-    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', storageAccountContributorRole)
+    roleDefinitionId: storageAccountContributorRoleID
     principalId: functionApp.identity.principalId
     principalType: 'ServicePrincipal'
   }
 }
 
-// 3. Storage Blob
+// 4. Storage Blob
 resource storageAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(storageAccount.id, functionApp.id, storageBlobDataOwnerRole)
+  name: guid(storageAccount.id, functionApp.id, storageBlobDataOwnerRoleID)
   scope: storageAccount
   properties: {
-    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', storageBlobDataOwnerRole)
+    roleDefinitionId: storageBlobDataOwnerRoleID
     principalId: functionApp.identity.principalId
     principalType: 'ServicePrincipal'
   }
 }
 
-// 4. Cosmos DB
+// 5. Cosmos DB
 resource cosmosAssignment 'Microsoft.DocumentDB/databaseAccounts/sqlRoleAssignments@2023-04-15' = {
   name: guid(cosmosAccount.id, functionApp.id, cosmosDataContributorRole)
   parent: cosmosAccount
@@ -195,7 +198,7 @@ resource cosmosAssignment 'Microsoft.DocumentDB/databaseAccounts/sqlRoleAssignme
   }
 }
 
-// 5. Key Vault Access Policy
+// 6. Key Vault Access Policy
 resource kvAccess 'Microsoft.KeyVault/vaults/accessPolicies@2023-02-01' = {
   parent: keyVault
   name: 'add'
