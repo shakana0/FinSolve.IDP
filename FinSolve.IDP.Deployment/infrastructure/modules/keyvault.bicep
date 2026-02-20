@@ -11,7 +11,7 @@ resource keyVault 'Microsoft.KeyVault/vaults@2023-02-01' = {
       family: 'A'
     }
     enableSoftDelete: true
-    enablePurgeProtection: false
+    enablePurgeProtection: true
     accessPolicies: []
   }
 }
