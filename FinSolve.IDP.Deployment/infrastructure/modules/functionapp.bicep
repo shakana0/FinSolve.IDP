@@ -151,10 +151,10 @@ var cosmosDataContributorRole = '00000000-0000-0000-0000-000000000002'
 
 // 1. Application Insights
 resource appInsightsRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(appInsights.id, functionApp.id, monitoringMetricsPublisherRoleID)
+  name: guid(appInsights.id, functionApp.id, '3913584d-2f98-4d3b-953e-7db0026df405')
   scope: appInsights
   properties: {
-    roleDefinitionId: monitoringMetricsPublisherRoleID
+    roleDefinitionId: '/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Authorization/roleDefinitions/3913584d-2f98-4d3b-953e-7db0026df405'
     principalId: functionApp.identity.principalId
     principalType: 'ServicePrincipal'
   }
@@ -162,10 +162,10 @@ resource appInsightsRoleAssignment 'Microsoft.Authorization/roleAssignments@2022
 
 // 2. Service Bus
 resource sbAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(serviceBusNamespace.id, functionApp.id, serviceBusDataOwnerRoleID)
+  name: guid(serviceBusNamespace.id, functionApp.id, '090c5cfd-751d-490a-8d92-f74d67c0738e')
   scope: serviceBusNamespace
   properties: {
-    roleDefinitionId: serviceBusDataOwnerRoleID
+    roleDefinitionId: '/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Authorization/roleDefinitions/090c5cfd-751d-490a-8d92-f74d67c0738e'
     principalId: functionApp.identity.principalId
     principalType: 'ServicePrincipal'
   }
@@ -173,10 +173,10 @@ resource sbAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
 
 // 3. Storage Account
 resource storageAccountAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(storageAccount.id, functionApp.id, storageAccountContributorRoleID)
+  name: guid(storageAccount.id, functionApp.id, '17d1049b-9a84-46fb-8f53-86981c22a3f4')
   scope: storageAccount
   properties: {
-    roleDefinitionId: storageAccountContributorRoleID
+    roleDefinitionId: '/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Authorization/roleDefinitions/17d1049b-9a84-46fb-8f53-86981c22a3f4'
     principalId: functionApp.identity.principalId
     principalType: 'ServicePrincipal'
   }
@@ -184,10 +184,10 @@ resource storageAccountAssignment 'Microsoft.Authorization/roleAssignments@2022-
 
 // 4. Storage Blob
 resource storageAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(storageAccount.id, functionApp.id, storageBlobDataOwnerRoleID)
+  name: guid(storageAccount.id, functionApp.id, 'b7e69acd-9874-41da-b595-185d17e94d6a')
   scope: storageAccount
   properties: {
-    roleDefinitionId: storageBlobDataOwnerRoleID
+    roleDefinitionId: '/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Authorization/roleDefinitions/b7e69acd-9874-41da-b595-185d17e94d6a'
     principalId: functionApp.identity.principalId
     principalType: 'ServicePrincipal'
   }
