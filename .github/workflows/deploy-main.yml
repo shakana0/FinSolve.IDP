@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - "infrastructure/**"
+      - "FinSolve.IDP.Deployment/infrastructure/**"
       - "FinSolve.IDP.Functions/**"
       - "FinSolve.IDP.Application/**"
       - "FinSolve.IDP.Domain/**"
@@ -38,8 +38,8 @@ jobs:
         with:
           scope: resourcegroup
           resourceGroupName: ${{ secrets.AZURE_RG }}
-          template: infrastructure/main.bicep
-          parameters: infrastructure/parameters/main.json
+          template: FinSolve.IDP.Deployment/infrastructure/main.bicep
+          parameters: FinSolve.IDP.Deployment/infrastructure/parameters/main.json
           failOnStdErr: false
 
   deploy-functions:
