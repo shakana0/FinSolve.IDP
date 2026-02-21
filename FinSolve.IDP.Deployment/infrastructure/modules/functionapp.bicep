@@ -10,8 +10,15 @@ param cosmosDatabaseName string
 param appInsightsName string
 param keyVaultName string
 
+// --- EXISTING RESOURCES ---
+
 resource storageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' existing = {
   name: storageAccountName
+}
+
+resource blobService 'Microsoft.Storage/storageAccounts/blobServices@2023-01-01' existing = {
+  name: 'default'
+  parent: storageAccount
 }
 
 resource serviceBusNamespace 'Microsoft.ServiceBus/namespaces@2022-10-01-preview' existing = {
@@ -84,7 +91,6 @@ resource functionApp 'Microsoft.Web/sites@2022-03-01' = {
           name: 'KeyVaultUri'
           value: keyVault.properties.vaultUri
         }
-        // Use Connection String (contains endpoint and instrumentation key)
         {
           name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
           value: appInsights.properties.ConnectionString
@@ -133,28 +139,33 @@ var monitoringMetricsPublisherRoleID = subscriptionResourceId(
   'Microsoft.Authorization/roleDefinitions',
   '3913584d-2f98-4d3b-953e-7db0026df405'
 )
+
 var serviceBusDataOwnerRoleID = subscriptionResourceId(
   'Microsoft.Authorization/roleDefinitions',
   '090c5cfd-751d-490a-8d92-f74d67c0738e'
 )
+
 var storageAccountContributorRoleID = subscriptionResourceId(
   'Microsoft.Authorization/roleDefinitions',
   '17d1049b-9a84-46fb-8f53-86981c22a3f4'
 )
+
 var storageBlobDataOwnerRoleID = subscriptionResourceId(
   'Microsoft.Authorization/roleDefinitions',
   'b7e69acd-9874-41da-b595-185d17e94d6a'
 )
+
+// Built‑in Cosmos DB Data Contributor role
 var cosmosDataContributorRole = '00000000-0000-0000-0000-000000000002'
 
 // ---  ROLE ASSIGNMENTS ---
 
 // 1. Application Insights
 resource appInsightsRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(appInsights.id, functionApp.id, '3913584d-2f98-4d3b-953e-7db0026df405')
+  name: guid(appInsights.id, functionApp.id, monitoringMetricsPublisherRoleID)
   scope: appInsights
   properties: {
-    roleDefinitionId: '/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Authorization/roleDefinitions/3913584d-2f98-4d3b-953e-7db0026df405'
+    roleDefinitionId: monitoringMetricsPublisherRoleID
     principalId: functionApp.identity.principalId
     principalType: 'ServicePrincipal'
   }
@@ -162,10 +173,10 @@ resource appInsightsRoleAssignment 'Microsoft.Authorization/roleAssignments@2022
 
 // 2. Service Bus
 resource sbAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(serviceBusNamespace.id, functionApp.id, '090c5cfd-751d-490a-8d92-f74d67c0738e')
+  name: guid(serviceBusNamespace.id, functionApp.id, serviceBusDataOwnerRoleID)
   scope: serviceBusNamespace
   properties: {
-    roleDefinitionId: '/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Authorization/roleDefinitions/090c5cfd-751d-490a-8d92-f74d67c0738e'
+    roleDefinitionId: serviceBusDataOwnerRoleID
     principalId: functionApp.identity.principalId
     principalType: 'ServicePrincipal'
   }
@@ -173,10 +184,10 @@ resource sbAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
 
 // 3. Storage Account
 resource storageAccountAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(storageAccount.id, functionApp.id, '17d1049b-9a84-46fb-8f53-86981c22a3f4')
+  name: guid(storageAccount.id, functionApp.id, storageAccountContributorRoleID)
   scope: storageAccount
   properties: {
-    roleDefinitionId: '/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Authorization/roleDefinitions/17d1049b-9a84-46fb-8f53-86981c22a3f4'
+    roleDefinitionId: storageAccountContributorRoleID
     principalId: functionApp.identity.principalId
     principalType: 'ServicePrincipal'
   }
@@ -184,10 +195,10 @@ resource storageAccountAssignment 'Microsoft.Authorization/roleAssignments@2022-
 
 // 4. Storage Blob
 resource storageAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(storageAccount.id, functionApp.id, 'b7e69acd-9874-41da-b595-185d17e94d6a')
-  scope: storageAccount
+  name: guid(blobService.id, functionApp.id, storageBlobDataOwnerRoleID)
+  scope: blobService
   properties: {
-    roleDefinitionId: '/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Authorization/roleDefinitions/b7e69acd-9874-41da-b595-185d17e94d6a'
+    roleDefinitionId: storageBlobDataOwnerRoleID
     principalId: functionApp.identity.principalId
     principalType: 'ServicePrincipal'
   }
@@ -204,21 +215,25 @@ resource cosmosAssignment 'Microsoft.DocumentDB/databaseAccounts/sqlRoleAssignme
       cosmosDataContributorRole
     )
     principalId: functionApp.identity.principalId
-    scope: cosmosAccount.id
+    // Scope: '/' = entire account
+    scope: '/'
   }
 }
 
 // 6. Key Vault Access Policy
 resource kvAccess 'Microsoft.KeyVault/vaults/accessPolicies@2023-02-01' = {
-  parent: keyVault
   name: 'add'
+  parent: keyVault
   properties: {
     accessPolicies: [
       {
         tenantId: subscription().tenantId
         objectId: functionApp.identity.principalId
         permissions: {
-          secrets: ['get', 'list']
+          secrets: [
+            'get'
+            'list'
+          ]
         }
       }
     ]
