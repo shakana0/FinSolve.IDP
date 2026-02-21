@@ -2,15 +2,15 @@ param environment string = 'main'
 param location string = resourceGroup().location
 param prefix string = 'idp'
 
-module eventgrid 'modules/eventgrid.bicep' = {
-  name: '${prefix}-eventgrid'
-  params: {
-    location: location
-    storageAccountId: storage.outputs.storageAccountId
-    functionAppId: functionapp.outputs.functionAppId
-    functionName: 'MetadataValidation'
-  }
-}
+// module eventgrid 'modules/eventgrid.bicep' = {
+//   name: '${prefix}-eventgrid'
+//   params: {
+//     location: location
+//     storageAccountId: storage.outputs.storageAccountId
+//     functionAppId: functionapp.outputs.functionAppId
+//     functionName: 'MetadataValidation'
+//   }
+// }
 
 module storage 'modules/storage.bicep' = {
   name: '${prefix}storage'
