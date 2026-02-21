@@ -135,25 +135,10 @@ resource functionApp 'Microsoft.Web/sites@2022-03-01' = {
 }
 
 // --- ROLE-DEFINITIONS ---
-var monitoringMetricsPublisherRoleID = subscriptionResourceId(
-  'Microsoft.Authorization/roleDefinitions',
-  '3913584d-2f98-4d3b-953e-7db0026df405'
-)
-
-var serviceBusDataOwnerRoleID = subscriptionResourceId(
-  'Microsoft.Authorization/roleDefinitions',
-  '090c5cfd-751d-490a-8d92-f74d67c0738e'
-)
-
-var storageAccountContributorRoleID = subscriptionResourceId(
-  'Microsoft.Authorization/roleDefinitions',
-  '17d1049b-9a84-46fb-8f53-86981c22a3f4'
-)
-
-var storageBlobDataOwnerRoleID = subscriptionResourceId(
-  'Microsoft.Authorization/roleDefinitions',
-  'b7e69acd-9874-41da-b595-185d17e94d6a'
-)
+var monitoringMetricsPublisherRoleID = '/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Authorization/roleDefinitions/3913584d-2f98-4d3b-953e-7db0026df405'
+var serviceBusDataOwnerRoleID = '/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Authorization/roleDefinitions/090c5cfd-751d-490a-8d92-f74d67c0738e'
+var storageAccountContributorRoleID = '/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Authorization/roleDefinitions/17d1049b-9a84-46fb-8f53-86981c22a3f4'
+var storageBlobDataOwnerRoleID = '/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Authorization/roleDefinitions/b7e69acd-9874-41da-b595-185d17e94d6a'
 
 // Built‑in Cosmos DB Data Contributor role
 var cosmosDataContributorRole = '00000000-0000-0000-0000-000000000002'
@@ -162,7 +147,7 @@ var cosmosDataContributorRole = '00000000-0000-0000-0000-000000000002'
 
 // 1. Application Insights
 resource appInsightsRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(appInsights.id, functionApp.id, monitoringMetricsPublisherRoleID)
+  name: guid(appInsights.id, functionApp.id, 'ai-role')
   scope: appInsights
   properties: {
     roleDefinitionId: monitoringMetricsPublisherRoleID
@@ -173,7 +158,7 @@ resource appInsightsRoleAssignment 'Microsoft.Authorization/roleAssignments@2022
 
 // 2. Service Bus
 resource sbAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(serviceBusNamespace.id, functionApp.id, serviceBusDataOwnerRoleID)
+  name: guid(serviceBusNamespace.id, functionApp.id, 'sb-role')
   scope: serviceBusNamespace
   properties: {
     roleDefinitionId: serviceBusDataOwnerRoleID
@@ -184,7 +169,7 @@ resource sbAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
 
 // 3. Storage Account
 resource storageAccountAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(storageAccount.id, functionApp.id, storageAccountContributorRoleID)
+  name: guid(storageAccount.id, functionApp.id, 'sa-role')
   scope: storageAccount
   properties: {
     roleDefinitionId: storageAccountContributorRoleID
@@ -195,7 +180,7 @@ resource storageAccountAssignment 'Microsoft.Authorization/roleAssignments@2022-
 
 // 4. Storage Blob
 resource storageAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(blobService.id, functionApp.id, storageBlobDataOwnerRoleID)
+  name: guid(blobService.id, functionApp.id, 'blob-role')
   scope: blobService
   properties: {
     roleDefinitionId: storageBlobDataOwnerRoleID
@@ -206,7 +191,7 @@ resource storageAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' 
 
 // 5. Cosmos DB
 resource cosmosAssignment 'Microsoft.DocumentDB/databaseAccounts/sqlRoleAssignments@2023-04-15' = {
-  name: guid(cosmosAccount.id, functionApp.id, cosmosDataContributorRole)
+  name: guid(cosmosAccount.id, functionApp.id, 'cosmos-role')
   parent: cosmosAccount
   properties: {
     roleDefinitionId: resourceId(
@@ -215,8 +200,7 @@ resource cosmosAssignment 'Microsoft.DocumentDB/databaseAccounts/sqlRoleAssignme
       cosmosDataContributorRole
     )
     principalId: functionApp.identity.principalId
-    // Scope: '/' = entire account
-    scope: '/'
+    scope: '/dbs'
   }
 }
 
