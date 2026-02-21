@@ -200,7 +200,7 @@ resource cosmosAssignment 'Microsoft.DocumentDB/databaseAccounts/sqlRoleAssignme
       cosmosDataContributorRole
     )
     principalId: functionApp.identity.principalId
-    scope: '/dbs'
+    scope: cosmosAccount.id
   }
 }
 
