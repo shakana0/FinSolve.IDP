@@ -66,8 +66,7 @@ jobs:
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
       - name: Publish Functions project
-        run: dotnet publish FinSolve.IDP.Functions/FinSolve.IDP.Functions.csproj -c Release -o published
-
+        run: dotnet publish FinSolve.IDP.Functions/FinSolve.IDP.Functions.csproj -c Release -o ./published
       - name: Deploy to Azure Function App
         run: |
           az functionapp deploy \
