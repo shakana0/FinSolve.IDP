@@ -11,6 +11,7 @@ param prefix string = 'idp'
 //     functionName: 'MetadataValidation'
 //   }
 // }
+//
 
 module storage 'modules/storage.bicep' = {
   name: '${prefix}storage'
