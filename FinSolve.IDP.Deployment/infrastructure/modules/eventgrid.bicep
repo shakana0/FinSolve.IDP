@@ -26,7 +26,7 @@ resource eventSubscription 'Microsoft.EventGrid/systemTopics/eventSubscriptions@
       includedEventTypes: [
         'Microsoft.Storage.BlobCreated'
       ]
-      subjectBeginsWith: '/blobServices/default/containers/idp-documents/'
+      subjectBeginsWith: '/blobServices/default/containers/documents/blobs/'
     }
   }
 }
