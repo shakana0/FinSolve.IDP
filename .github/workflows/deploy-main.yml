@@ -65,12 +65,18 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
+      - name: Create publish directory
+        run: mkdir -p ${{ github.workspace }}/output
+
       - name: Publish Functions project
-        run: dotnet publish FinSolve.IDP.Functions/FinSolve.IDP.Functions.csproj -c Release -o ${{ github.workspace }}/published
+        run: dotnet publish FinSolve.IDP.Functions/FinSolve.IDP.Functions.csproj -c Release -o ${{ github.workspace }}/output
+      - name: List files for debugging
+        run: ls -R ${{ github.workspace }}/output
+
       - name: Deploy to Azure Function App
         run: |
           az functionapp deploy \
             --resource-group ${{ secrets.AZURE_RG }} \
             --name ${{ secrets.AZURE_FUNCTIONAPP_NAME }} \
-            --src-path published \
+           --src-path ${{ github.workspace }}/output \
             --type zip
