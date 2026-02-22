@@ -1,4 +1,5 @@
-﻿using Azure.Messaging;
+﻿using System.Text.Json;
+using Azure.Messaging;
 using FinSolve.IDP.Application.DTOs;
 using FinSolve.IDP.Application.Interfaces;
 using FinSolve.IDP.Application.Services.DocumentMetadata;
@@ -29,26 +30,40 @@ public class MetadataValidationFunction
     }
 
     [Function("MetadataValidation")]
-    public async Task RunAsync([EventGridTrigger] CloudEvent cloudEvent)
+    public async Task RunAsync([EventGridTrigger] JsonElement eventGridEvent)
     {
         _logger.LogInformation("MetadataValidationFunction triggered via Event Grid");
 
         // 1. Extract information from eventet
-        // Subject usually looks like: /blobServices/default/containers/idp-documents/blobs/kvitto.pdf
-        var blobPath = cloudEvent.Subject;
+        string? blobPath = null;
+        if (eventGridEvent.TryGetProperty("data", out var dataProp) &&
+            dataProp.TryGetProperty("url", out var urlProp))
+        {
+            blobPath = urlProp.GetString();
+        }
+        // Fallback if it uses subject
+        else if (eventGridEvent.TryGetProperty("subject", out var subjectProp))
+        {
+            blobPath = subjectProp.GetString();
+        }
+
+        if (string.IsNullOrEmpty(blobPath))
+        {
+            _logger.LogError("Could not extract blobPath from EventGridSchema");
+            return;
+        }
+
+        _logger.LogInformation($"Processing file: {blobPath}");
+
         var fileName = Path.GetFileName(blobPath);
 
         _logger.LogInformation($"Processing file from Event Grid: {fileName}");
 
-        // 1. Download file as byte[]
-        byte[] fileBytes = await _blobStorage.DownloadAsync(blobPath);
+        // 1. Download file as Stream
+        using Stream fileStream = await _blobStorage.DownloadStreamAsync(blobPath);
 
-        // 2. Create a Stream (because MetadataExtractionService requires it)
-        using var stream = new MemoryStream(fileBytes);
-
-        // 3. Use Application Service to extract domain metadata
-        // This handles FormatDetection, ReaderFactory and MetadataExtractor internally
-        var domainMetadata = await _metadataService.ExtractAsync(fileName, stream);
+        // 2. Use Application Service to extract domain metadata
+        var domainMetadata = await _metadataService.ExtractAsync(fileName, fileStream);
 
         // 2.Create metadata-DTO
         var metadata = new DocumentMetadataDto
