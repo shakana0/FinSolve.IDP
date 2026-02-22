@@ -7,5 +7,6 @@
             byte[] content,
             IDictionary<string, string> metadata);
         Task<byte[]> DownloadAsync(string blobPath);
+        Task<Stream> DownloadStreamAsync(string blobPath);
     }
 }
