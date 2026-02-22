@@ -1,4 +1,5 @@
-﻿using Azure.Storage.Blobs;
+﻿using Azure.Identity;
+using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using FinSolve.IDP.Application.Interfaces;
 
@@ -43,6 +44,22 @@ namespace FinSolve.IDP.Infrastructure.Blob
             using var ms = new MemoryStream();
             await client.DownloadToAsync(ms);
             return ms.ToArray();
+        }
+
+        public async Task<Stream> DownloadStreamAsync(string blobPath)
+        {
+            BlobClient blobClient;
+
+            if (Uri.TryCreate(blobPath, UriKind.Absolute, out var uri))
+            {
+                blobClient = new BlobClient(uri, new DefaultAzureCredential());
+            }
+            else
+            {
+                blobClient = _container.GetBlobClient(blobPath);
+            }
+
+            return await blobClient.OpenReadAsync();
         }
 
     }
