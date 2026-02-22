@@ -12,16 +12,28 @@ resource serviceBusNamespace 'Microsoft.ServiceBus/namespaces@2022-10-01-preview
 
 resource topic 'Microsoft.ServiceBus/namespaces/topics@2022-10-01-preview' = {
   parent: serviceBusNamespace
-  name: 'idp-events'
+  name: topicName
 }
 
 // 1. Metadata Validated Subscription & Rule
 resource metadataValidatedSub 'Microsoft.ServiceBus/namespaces/topics/subscriptions@2022-10-01-preview' = {
   parent: topic
-  name: 'metadata-validated-sub'
+  name: 'metadata-validated'
   properties: {
     maxDeliveryCount: 5
     deadLetteringOnMessageExpiration: true
+    enableBatchedOperations: true
+  }
+}
+
+resource metadataValidatedRemoveDefaultRule 'Microsoft.ServiceBus/namespaces/topics/subscriptions/rules@2022-10-01-preview' = {
+  parent: metadataValidatedSub
+  name: '$Default'
+  properties: {
+    filterType: 'SqlFilter'
+    sqlFilter: {
+      sqlExpression: '1=0'
+    }
   }
 }
 
@@ -39,10 +51,22 @@ resource metadataValidatedRule 'Microsoft.ServiceBus/namespaces/topics/subscript
 // 2. Processing Completed Subscription & Rule
 resource processingCompletedSub 'Microsoft.ServiceBus/namespaces/topics/subscriptions@2022-10-01-preview' = {
   parent: topic
-  name: 'processing-completed-sub'
+  name: 'processing-completed'
   properties: {
     maxDeliveryCount: 5
     deadLetteringOnMessageExpiration: true
+    enableBatchedOperations: true
+  }
+}
+
+resource processingCompletedRemoveDefaultRule 'Microsoft.ServiceBus/namespaces/topics/subscriptions/rules@2022-10-01-preview' = {
+  parent: processingCompletedSub
+  name: '$Default'
+  properties: {
+    filterType: 'SqlFilter'
+    sqlFilter: {
+      sqlExpression: '1=0'
+    }
   }
 }
 
@@ -60,10 +84,22 @@ resource processingCompletedRule 'Microsoft.ServiceBus/namespaces/topics/subscri
 // 3. Summary Created Subscription & Rule
 resource summaryCreatedSub 'Microsoft.ServiceBus/namespaces/topics/subscriptions@2022-10-01-preview' = {
   parent: topic
-  name: 'summary-created-sub'
+  name: 'summary-created'
   properties: {
     maxDeliveryCount: 5
     deadLetteringOnMessageExpiration: true
+    enableBatchedOperations: true
+  }
+}
+
+resource summaryCreatedRemoveDefaultRule 'Microsoft.ServiceBus/namespaces/topics/subscriptions/rules@2022-10-01-preview' = {
+  parent: summaryCreatedSub
+  name: '$Default'
+  properties: {
+    filterType: 'SqlFilter'
+    sqlFilter: {
+      sqlExpression: '1=0'
+    }
   }
 }
 
@@ -81,10 +117,22 @@ resource summaryCreatedRule 'Microsoft.ServiceBus/namespaces/topics/subscription
 // 4. PDF Generated Subscription & Rule
 resource pdfGeneratedSub 'Microsoft.ServiceBus/namespaces/topics/subscriptions@2022-10-01-preview' = {
   parent: topic
-  name: 'pdf-generated-sub'
+  name: 'pdf-generated'
   properties: {
     maxDeliveryCount: 5
     deadLetteringOnMessageExpiration: true
+    enableBatchedOperations: true
+  }
+}
+
+resource pdfGeneratedRemoveDefaultRule 'Microsoft.ServiceBus/namespaces/topics/subscriptions/rules@2022-10-01-preview' = {
+  parent: pdfGeneratedSub
+  name: '$Default'
+  properties: {
+    filterType: 'SqlFilter'
+    sqlFilter: {
+      sqlExpression: '1=0'
+    }
   }
 }
 
