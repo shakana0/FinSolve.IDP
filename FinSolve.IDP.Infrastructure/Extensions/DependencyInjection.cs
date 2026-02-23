@@ -23,13 +23,35 @@ public static class DependencyInjection
 
         // Cosmos DB
         services.AddSingleton(sp => new CosmosClient(
-            Environment.GetEnvironmentVariable("CosmosDbAccountEndpoint"),
+            config["CosmosDbAccountEndpoint"],
             new DefaultAzureCredential()));
 
-        services.AddSingleton(sp =>
+        services.AddSingleton<IDocumentHashRepository>(sp =>
         {
             var client = sp.GetRequiredService<CosmosClient>();
-            return client.GetContainer(config["Cosmos:Database"], config["Cosmos:Container"]);
+            var container = client.GetContainer(config["Cosmos__Database"], config["Cosmos__StatusContainer"]);
+            return new DocumentHashRepository(container);
+        });
+
+        services.AddSingleton<IDocumentStatusRepository>(sp =>
+        {
+            var client = sp.GetRequiredService<CosmosClient>();
+            var container = client.GetContainer(config["Cosmos__Database"], config["Cosmos__StatusContainer"]);
+            return new DocumentStatusRepository(container);
+        });
+
+        services.AddSingleton<IProcessingResultRepository>(sp =>
+        {
+            var client = sp.GetRequiredService<CosmosClient>();
+            var container = client.GetContainer(config["Cosmos__Database"], config["Cosmos__ResultContainer"]);
+            return new ProcessingResultRepository(container);
+        });
+
+        services.AddSingleton<IDlqRepository>(sp =>
+        {
+            var client = sp.GetRequiredService<CosmosClient>();
+            var container = client.GetContainer(config["Cosmos__Database"], config["Cosmos__DlqContainer"]);
+            return new DlqRepository(container);
         });
 
         // Blob Storage
@@ -38,26 +60,21 @@ public static class DependencyInjection
             new DefaultAzureCredential()));
 
         services.AddSingleton(sp =>
-        {
-            var service = sp.GetRequiredService<BlobServiceClient>();
-            return service.GetBlobContainerClient(config["BlobStorage:ContainerName"]);
-        });
+      {
+          var service = sp.GetRequiredService<BlobServiceClient>();
+          var containerName = config["BlobStorage:ContainerName"] ?? "documents";
+          return service.GetBlobContainerClient(containerName);
+      });
 
         // Service Bus
         services.AddSingleton(sp => new ServiceBusClient(
-            Environment.GetEnvironmentVariable("ServiceBusConnection__fullyQualifiedNamespace"),
-            new DefaultAzureCredential()));
+          config["ServiceBusConnection__fullyQualifiedNamespace"],
+          new DefaultAzureCredential()));
 
         // Blob Storage
         services.AddSingleton<IBlobStorage, AzureBlobStorage>();
 
-        // Cosmos DB Repositories
-        services.AddSingleton<IDocumentHashRepository, DocumentHashRepository>();
-        services.AddSingleton<IDocumentStatusRepository, DocumentStatusRepository>();
-        services.AddSingleton<IProcessingResultRepository, ProcessingResultRepository>();
-
         // Messaging
-        services.AddSingleton<IDlqRepository, DlqRepository>();
         services.AddSingleton<IMessagePublisher, ServiceBusMessagePublisher>();
 
         // PDF Generation
