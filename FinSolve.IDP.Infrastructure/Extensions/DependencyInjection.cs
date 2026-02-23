@@ -20,11 +20,11 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration config)
     {
+        var cosmosEndpoint = config["CosmosDbAccountEndpoint"] ?? throw new InvalidOperationException("Missing 'CosmosDbAccountEndpoint'");
+        var storageAccount = config["StorageAccountName"] ?? throw new InvalidOperationException("Missing 'StorageAccountName'");
+        var sbNamespace = config["ServiceBusConnection__fullyQualifiedNamespace"] ?? throw new InvalidOperationException("Missing 'ServiceBusConnection__fullyQualifiedNamespace'");
 
-        // Cosmos DB
-        services.AddSingleton(sp => new CosmosClient(
-            config["CosmosDbAccountEndpoint"],
-            new DefaultAzureCredential()));
+        services.AddSingleton(sp => new CosmosClient(cosmosEndpoint, new DefaultAzureCredential()));
 
         services.AddSingleton<IDocumentHashRepository>(sp =>
         {
@@ -54,43 +54,23 @@ public static class DependencyInjection
             return new DlqRepository(container);
         });
 
-        // Blob Storage
+        services.AddSingleton(sp => new BlobServiceClient(
+            new Uri($"https://{storageAccount}.blob.core.windows.net"),
+            new DefaultAzureCredential()));
+
         services.AddSingleton(sp =>
         {
-            var accountName = config["StorageAccountName"];
-            if (string.IsNullOrEmpty(accountName))
-            {
-                throw new InvalidOperationException("Configuration 'StorageAccountName' is missing. Check Azure App Settings.");
-            }
-
-            return new BlobServiceClient(
-                new Uri($"https://{accountName}.blob.core.windows.net"),
-                new DefaultAzureCredential());
+            var service = sp.GetRequiredService<BlobServiceClient>();
+            var containerName = config["BlobStorage__ContainerName"] ?? "documents";
+            return service.GetBlobContainerClient(containerName);
         });
 
-        services.AddSingleton(sp =>
-      {
-          var service = sp.GetRequiredService<BlobServiceClient>();
-          var containerName = config["BlobStorage:ContainerName"] ?? "documents";
-          return service.GetBlobContainerClient(containerName);
-      });
+        services.AddSingleton(sp => new ServiceBusClient(sbNamespace, new DefaultAzureCredential()));
 
-        // Service Bus
-        services.AddSingleton(sp => new ServiceBusClient(
-          config["ServiceBusConnection__fullyQualifiedNamespace"],
-          new DefaultAzureCredential()));
-
-        // Blob Storage
         services.AddSingleton<IBlobStorage, AzureBlobStorage>();
-
-        // Messaging
         services.AddSingleton<IMessagePublisher, ServiceBusMessagePublisher>();
-
-        // PDF Generation
         services.AddScoped<IMetadataExtractor, PdfContentExtractor>();
         services.AddSingleton<IReportGenerator, QuestPdfGenerator>();
-
-        // Security & Telemetry
         services.AddSingleton<IKeyVaultSecretProvider, KeyVaultSecretProvider>();
         services.AddSingleton<ILoggingAdapter, ApplicationInsightsLogger>();
 
