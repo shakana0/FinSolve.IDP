@@ -4,7 +4,13 @@
     "AzureWebJobsStorage": "UseDevelopmentStorage=true",
     "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
     "KeyVaultUri": "https://idpdevsj26-kv.vault.azure.net/",
+    "StorageAccountName": "idpdevsj26storage",
     "CosmosDbAccountEndpoint": "https://idpdevsj26-cosmos.documents.azure.com:443/",
-    "StorageAccountName": "idpdevsj26storage"
+    "Cosmos__Database": "idp-db",
+    "Cosmos__StatusContainer": "documentStatus",
+    "Cosmos__ResultContainer": "processingResults",
+    "Cosmos__DlqContainer": "deadLetters",
+    "BlobStorage:ContainerName": "uploads",
+    "ServiceBusConnection__fullyQualifiedNamespace": "idpdevsj26-sb.servicebus.windows.net"
   }
 }
