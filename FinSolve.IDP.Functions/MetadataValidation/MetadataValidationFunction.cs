@@ -1,9 +1,10 @@
 ﻿using System.Text.Json;
-using Azure.Messaging;
 using FinSolve.IDP.Application.DTOs;
 using FinSolve.IDP.Application.Interfaces;
 using FinSolve.IDP.Application.Services.DocumentMetadata;
+using FinSolve.IDP.Domain.Interfaces;
 using Microsoft.Azure.Functions.Worker;
+using FinSolve.IDP.Domain.ValueObjects;
 
 namespace FinSolve.IDP.Functions.MetadataValidation;
 
@@ -34,18 +35,7 @@ public class MetadataValidationFunction
     {
         _logger.LogInformation("MetadataValidationFunction triggered via Event Grid");
 
-        // 1. Extract information from eventet
-        string? blobPath = null;
-        if (eventGridEvent.TryGetProperty("data", out var dataProp) &&
-            dataProp.TryGetProperty("url", out var urlProp))
-        {
-            blobPath = urlProp.GetString();
-        }
-        // Fallback if it uses subject
-        else if (eventGridEvent.TryGetProperty("subject", out var subjectProp))
-        {
-            blobPath = subjectProp.GetString();
-        }
+        string? blobPath = ExtractBlobPath(eventGridEvent);
 
         if (string.IsNullOrEmpty(blobPath))
         {
@@ -53,19 +43,13 @@ public class MetadataValidationFunction
             return;
         }
 
-        _logger.LogInformation($"Processing file: {blobPath}");
-
         var fileName = Path.GetFileName(blobPath);
-
-        _logger.LogInformation($"Processing file from Event Grid: {fileName}");
-
-        // 1. Download file as Stream
         using Stream fileStream = await _blobStorage.DownloadStreamAsync(blobPath);
 
-        // 2. Use Application Service to extract domain metadata
+        // 1. Extract metadata
         var domainMetadata = await _metadataService.ExtractAsync(fileName, fileStream);
 
-        // 2.Create metadata-DTO
+        // 2. Create DTO
         var metadata = new DocumentMetadataDto
         {
             DocumentId = Guid.NewGuid().ToString(),
@@ -76,30 +60,44 @@ public class MetadataValidationFunction
             ContentType = domainMetadata.Type.ToString()
         };
 
-        // 3. Validation
         if (!metadata.IsValid())
         {
             _logger.LogWarning($"Invalid metadata generated for file: {fileName}");
             throw new Exception("Invalid metadata");
         }
 
-        // 4. Idempotence check with Hash
-        var hash = metadata.GenerateHash();
-        var exists = await _hashRepository.ExistsAsync(metadata.DocumentId!);
+
+        // 3. Generate Hash-object
+        var hashValue = metadata.GenerateHash();
+        var hash = new Hash(hashValue);
+
+        // 4. Idempotens controle
+        var exists = await _hashRepository.ExistsAsync(hash);
 
         if (exists)
         {
-            _logger.LogWarning($"Duplicate document detected (Hash: {hash}), skipping.");
+            _logger.LogWarning($"Duplicate document detected (Hash: {hash.Value}), skipping.");
             return;
         }
 
-        // 5. Save and publish
-        await _hashRepository.SaveHashAsync(metadata.DocumentId!, hash);
+        // 5. Save
+        await _hashRepository.SaveAsync(metadata.DocumentId!, hash);
+
         _logger.LogInformation("Hash saved for idempotency");
 
         await _publisher.PublishAsync("idp-documents", metadata, "MetadataValidated");
-        _logger.LogInformation("Published event to Service Bus topic: idp-documents with subject: MetadataValidated");
+        _logger.LogInformation("Published event to Service Bus");
+    }
 
-        _logger.LogInformation("MetadataValidation completed successfully");
+    private string? ExtractBlobPath(JsonElement eventGridEvent)
+    {
+        if (eventGridEvent.TryGetProperty("data", out var dataProp) &&
+            dataProp.TryGetProperty("url", out var urlProp))
+            return urlProp.GetString();
+
+        if (eventGridEvent.TryGetProperty("subject", out var subjectProp))
+            return subjectProp.GetString();
+
+        return null;
     }
 }
