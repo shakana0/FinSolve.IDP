@@ -55,9 +55,18 @@ public static class DependencyInjection
         });
 
         // Blob Storage
-        services.AddSingleton(sp => new BlobServiceClient(
-            new Uri($"https://{config["StorageAccountName"]}.blob.core.windows.net"),
-            new DefaultAzureCredential()));
+        services.AddSingleton(sp =>
+        {
+            var accountName = config["StorageAccountName"];
+            if (string.IsNullOrEmpty(accountName))
+            {
+                throw new InvalidOperationException("Configuration 'StorageAccountName' is missing. Check Azure App Settings.");
+            }
+
+            return new BlobServiceClient(
+                new Uri($"https://{accountName}.blob.core.windows.net"),
+                new DefaultAzureCredential());
+        });
 
         services.AddSingleton(sp =>
       {
