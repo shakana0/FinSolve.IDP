@@ -8,9 +8,9 @@ public class DocumentStatusRepository : IDocumentStatusRepository
 {
     private readonly Container _container;
 
-    public DocumentStatusRepository(CosmosClient client)
+    public DocumentStatusRepository(Container container)
     {
-        _container = client.GetContainer("idp", "document-status");
+        _container = container;
     }
 
     public async Task SaveAsync(DocumentStatusDto status)

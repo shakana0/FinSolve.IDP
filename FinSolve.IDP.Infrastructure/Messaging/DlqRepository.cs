@@ -2,14 +2,15 @@
 using FinSolve.IDP.Application.Interfaces;
 using Microsoft.Azure.Cosmos;
 
-namespace FinSolve.IDP.Infrastructure.Messaging {
+namespace FinSolve.IDP.Infrastructure.Messaging
+{
     public class DlqRepository : IDlqRepository
     {
         private readonly Container _container;
 
-        public DlqRepository(CosmosClient client)
+        public DlqRepository(Container container)
         {
-            _container = client.GetContainer("idp", "dlq");
+            _container = container;
         }
 
         public async Task SaveAsync(DeadLetterMessageDto message)
