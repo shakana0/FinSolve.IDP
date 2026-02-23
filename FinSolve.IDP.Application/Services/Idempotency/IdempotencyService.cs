@@ -11,16 +11,19 @@ namespace FinSolve.IDP.Application.Services.Idempotency
             _repository = repository;
         }
 
-        public async Task<bool> IsDuplicateAsync(string content)
+        public async Task<bool> IsDuplicateAsync(string documentId, string content)
         {
             var hash = HashGenerator.Compute(content);
 
             var exists = await _repository.ExistsAsync(hash);
 
             if (exists)
+            {
                 return true;
+            }
 
-            await _repository.SaveAsync(hash);
+            await _repository.SaveAsync(documentId, hash);
+
             return false;
         }
     }
