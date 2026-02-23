@@ -1,6 +1,8 @@
 ﻿using FinSolve.IDP.Application.DTOs;
-using FinSolve.IDP.Application.Interfaces;
+using FinSolve.IDP.Domain.Interfaces;
+using FinSolve.IDP.Domain.Entities;
 using Microsoft.Azure.Cosmos;
+using FinSolve.IDP.Domain.ValueObjects;
 
 namespace FinSolve.IDP.Infrastructure.Cosmos
 {
@@ -13,13 +15,13 @@ namespace FinSolve.IDP.Infrastructure.Cosmos
             _container = container;
         }
 
-        public async Task<bool> ExistsAsync(string documentId)
+        public async Task<bool> ExistsAsync(Hash hash)
         {
             try
             {
                 var response = await _container.ReadItemAsync<DocumentHashCosmosDto>(
-                    id: documentId,
-                    partitionKey: new PartitionKey(documentId)
+                    id: hash.Value,
+                    partitionKey: new PartitionKey(hash.Value)
                 );
 
                 return response.Resource != null;
@@ -30,16 +32,16 @@ namespace FinSolve.IDP.Infrastructure.Cosmos
             }
         }
 
-        public async Task SaveHashAsync(string documentId, string hash)
+        public async Task SaveAsync(string documentId, Hash hash)
         {
             var dto = new DocumentHashCosmosDto
             {
-                id = documentId,
+                id = hash.Value,
                 DocumentId = documentId,
-                Hash = hash
+                Hash = hash.Value
             };
 
-            await _container.UpsertItemAsync(dto, new PartitionKey(documentId));
+            await _container.UpsertItemAsync(dto, new PartitionKey(hash.Value));
         }
     }
 }
