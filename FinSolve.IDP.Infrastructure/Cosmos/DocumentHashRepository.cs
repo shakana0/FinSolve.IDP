@@ -1,6 +1,5 @@
 ﻿using FinSolve.IDP.Application.DTOs;
 using FinSolve.IDP.Domain.Interfaces;
-using FinSolve.IDP.Domain.Entities;
 using Microsoft.Azure.Cosmos;
 using FinSolve.IDP.Domain.ValueObjects;
 
