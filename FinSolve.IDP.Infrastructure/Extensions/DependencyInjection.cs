@@ -12,6 +12,7 @@ using Azure.Identity;
 using Azure.Storage.Blobs;
 using Azure.Messaging.ServiceBus;
 using Microsoft.Extensions.Configuration;
+using FinSolve.IDP.Domain.Interfaces;
 
 namespace FinSolve.IDP.Infrastructure.Extensions;
 
@@ -60,7 +61,8 @@ public static class DependencyInjection
         services.AddSingleton<IMessagePublisher, ServiceBusMessagePublisher>();
 
         // PDF Generation
-        services.AddSingleton<IPdfGenerator, QuestPdfGenerator>();
+        services.AddScoped<IMetadataExtractor, PdfContentExtractor>();
+        services.AddSingleton<IReportGenerator, QuestPdfGenerator>();
 
         // Security & Telemetry
         services.AddSingleton<IKeyVaultSecretProvider, KeyVaultSecretProvider>();
