@@ -10,7 +10,8 @@
     "Cosmos__StatusContainer": "documentStatus",
     "Cosmos__ResultContainer": "processingResults",
     "Cosmos__DlqContainer": "deadLetters",
-    "BlobStorage:ContainerName": "uploads",
-    "ServiceBusConnection__fullyQualifiedNamespace": "idpdevsj26-sb.servicebus.windows.net"
+    "BlobStorage__ContainerName": "documents",
+    "ServiceBusConnection__fullyQualifiedNamespace": "idpdevsj26-sb.servicebus.windows.net",
+    "ServiceBus__TopicName": "idp-documents"
   }
 }
