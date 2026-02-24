@@ -11,7 +11,7 @@
     "Cosmos__ResultContainer": "processingResults",
     "Cosmos__DlqContainer": "deadLetters",
     "BlobStorage__ContainerName": "documents",
-    "ServiceBusConnection__fullyQualifiedNamespace": "idpdevsj26-sb.servicebus.windows.net",
+    "ServiceBusConnection__fullyQualifiedNamespace": "idpdevsj26-sb-namespace.servicebus.windows.net",
     "ServiceBus__TopicName": "idp-documents"
   }
 }
