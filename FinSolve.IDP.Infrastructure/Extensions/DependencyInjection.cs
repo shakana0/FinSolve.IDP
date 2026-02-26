@@ -20,45 +20,57 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration config)
     {
-        var sbNamespace = config["ServiceBusConnection:fullyQualifiedNamespace"]
-            ?? config["ServiceBusConnection__fullyQualifiedNamespace"]
-            ?? throw new InvalidOperationException("DEBUG: Can not find ServiceBusConnection in App Settings. Check spelling!");
+        // 1. Hämta alla värden med "dual-lookup" (både : och __)
+        var sbNamespace = config["ServiceBusConnection:fullyQualifiedNamespace"] ?? config["ServiceBusConnection__fullyQualifiedNamespace"]
+            ?? throw new InvalidOperationException("DEBUG: Missing ServiceBusConnection");
 
         var storageAccount = config["StorageAccountName"]
-            ?? throw new InvalidOperationException("DEBUG: Can not find StorageAccountName.");
+            ?? throw new InvalidOperationException("DEBUG: Missing StorageAccountName");
 
         var cosmosEndpoint = config["CosmosDbAccountEndpoint"]
-            ?? throw new InvalidOperationException("DEBUG: Can not find CosmosDbAccountEndpoint.");
+            ?? throw new InvalidOperationException("DEBUG: Missing CosmosDbAccountEndpoint");
 
-        var cosmosDb = config["Cosmos__Database"] ?? throw new InvalidOperationException("Missing 'Cosmos__Database'");
+        // HÄR ÄR FIXEN: Kolla båda formaten för Cosmos
+        var cosmosDbName = config["Cosmos:Database"] ?? config["Cosmos__Database"]
+            ?? throw new InvalidOperationException("DEBUG: Missing Cosmos__Database in App Settings");
+
+        var statusContainer = config["Cosmos:StatusContainer"] ?? config["Cosmos__StatusContainer"]
+            ?? throw new InvalidOperationException("DEBUG: Missing Cosmos__StatusContainer");
+
+        var resultContainer = config["Cosmos:ResultContainer"] ?? config["Cosmos__ResultContainer"]
+            ?? throw new InvalidOperationException("DEBUG: Missing Cosmos__ResultContainer");
+
+        var dlqContainer = config["Cosmos:DlqContainer"] ?? config["Cosmos__DlqContainer"]
+            ?? throw new InvalidOperationException("DEBUG: Missing Cosmos__DlqContainer");
+
 
         services.AddSingleton(sp => new CosmosClient(cosmosEndpoint, new DefaultAzureCredential()));
 
         services.AddSingleton<IDocumentHashRepository>(sp =>
         {
             var client = sp.GetRequiredService<CosmosClient>();
-            var container = client.GetContainer(config["Cosmos__Database"], config["Cosmos__StatusContainer"]);
+            var container = client.GetContainer(cosmosDbName, statusContainer);
             return new DocumentHashRepository(container);
         });
 
         services.AddSingleton<IDocumentStatusRepository>(sp =>
         {
             var client = sp.GetRequiredService<CosmosClient>();
-            var container = client.GetContainer(config["Cosmos__Database"], config["Cosmos__StatusContainer"]);
+            var container = client.GetContainer(cosmosDbName, statusContainer);
             return new DocumentStatusRepository(container);
         });
 
         services.AddSingleton<IProcessingResultRepository>(sp =>
         {
             var client = sp.GetRequiredService<CosmosClient>();
-            var container = client.GetContainer(config["Cosmos__Database"], config["Cosmos__ResultContainer"]);
+            var container = client.GetContainer(cosmosDbName, resultContainer);
             return new ProcessingResultRepository(container);
         });
 
         services.AddSingleton<IDlqRepository>(sp =>
         {
             var client = sp.GetRequiredService<CosmosClient>();
-            var container = client.GetContainer(config["Cosmos__Database"], config["Cosmos__DlqContainer"]);
+            var container = client.GetContainer(cosmosDbName, dlqContainer);
             return new DlqRepository(container);
         });
 
