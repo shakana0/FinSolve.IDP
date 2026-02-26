@@ -20,9 +20,17 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration config)
     {
-        var cosmosEndpoint = config["CosmosDbAccountEndpoint"] ?? throw new InvalidOperationException("Missing 'CosmosDbAccountEndpoint'");
-        var storageAccount = config["StorageAccountName"] ?? throw new InvalidOperationException("Missing 'StorageAccountName'");
-        var sbNamespace = config["ServiceBusConnection__fullyQualifiedNamespace"] ?? throw new InvalidOperationException("Missing 'ServiceBusConnection__fullyQualifiedNamespace'");
+        var sbNamespace = config["ServiceBusConnection:fullyQualifiedNamespace"]
+            ?? config["ServiceBusConnection__fullyQualifiedNamespace"]
+            ?? throw new InvalidOperationException("DEBUG: Can not find ServiceBusConnection in App Settings. Check spelling!");
+
+        var storageAccount = config["StorageAccountName"]
+            ?? throw new InvalidOperationException("DEBUG: Can not find StorageAccountName.");
+
+        var cosmosEndpoint = config["CosmosDbAccountEndpoint"]
+            ?? throw new InvalidOperationException("DEBUG: Can not find CosmosDbAccountEndpoint.");
+
+        var cosmosDb = config["Cosmos__Database"] ?? throw new InvalidOperationException("Missing 'Cosmos__Database'");
 
         services.AddSingleton(sp => new CosmosClient(cosmosEndpoint, new DefaultAzureCredential()));
 
