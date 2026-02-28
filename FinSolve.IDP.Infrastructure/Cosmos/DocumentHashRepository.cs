@@ -16,31 +16,24 @@ namespace FinSolve.IDP.Infrastructure.Cosmos
 
         public async Task<bool> ExistsAsync(Hash hash)
         {
-            try
-            {
-                var response = await _container.ReadItemAsync<DocumentHashCosmosDto>(
-                    id: hash.Value,
-                    partitionKey: new PartitionKey(hash.Value)
-                );
+            var query = new QueryDefinition("SELECT VALUE COUNT(1) FROM c WHERE c.id = @hash")
+                .WithParameter("@hash", hash.Value);
 
-                return response.Resource != null;
-            }
-            catch (CosmosException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
-            {
-                return false;
-            }
+            var iterator = _container.GetItemQueryIterator<int>(query);
+            var response = await iterator.ReadNextAsync();
+            return response.First() > 0;
         }
 
         public async Task SaveAsync(string documentId, Hash hash)
         {
             var dto = new DocumentHashCosmosDto
             {
-                id = hash.Value,
+                Id = hash.Value,
                 DocumentId = documentId,
                 Hash = hash.Value
             };
 
-            await _container.UpsertItemAsync(dto, new PartitionKey(dto.DocumentId));
+            await _container.UpsertItemAsync(dto, new PartitionKey(documentId));
         }
     }
 }
