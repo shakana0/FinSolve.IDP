@@ -16,14 +16,21 @@ namespace FinSolve.IDP.Application.Services.DocumentProcessing
 
         public IDocumentReader GetReader(DocumentType type)
         {
-            return type switch
+            var reader = type switch
             {
-                DocumentType.Txt => _readers.OfType<TxtDocumentReader>().First(),
-                DocumentType.Csv => _readers.OfType<CsvDocumentReader>().First(),
-                DocumentType.Pdf => _readers.OfType<PdfDocumentReader>().First(),
-                DocumentType.Docx => _readers.OfType<DocxDocumentReader>().First(),
-                _ => throw new UnsupportedFormatException(type.ToString())
+                // We cast to (IDocumentReader) to help the compiler find the best type for the switch
+                DocumentType.Txt => (IDocumentReader?)_readers.OfType<TxtDocumentReader>().FirstOrDefault(),
+                DocumentType.Csv => _readers.OfType<CsvDocumentReader>().FirstOrDefault(),
+                DocumentType.Pdf => _readers.OfType<PdfDocumentReader>().FirstOrDefault(),
+                DocumentType.Docx => _readers.OfType<DocxDocumentReader>().FirstOrDefault(),
+
+                DocumentType.Json => throw new UnsupportedFormatException("JSON reader is not yet implemented"),
+                DocumentType.Unknown => throw new UnsupportedFormatException("Cannot process document of unknown type"),
+
+                _ => throw new UnsupportedFormatException($"No reader defined for {type}")
             };
+            // If reader is null, it means the dependency was not registered in DI
+            return reader ?? throw new UnsupportedFormatException($"No reader registered in DI for {type}");
         }
     }
 }
