@@ -27,11 +27,10 @@ namespace FinSolve.IDP.Infrastructure.Cosmos
                 PrimaryCategory = result.PrimaryCategory,
                 Items = result.Items.ToList(),
                 Summary = result.Summary,
-                PartitionKey = documentIdString,
                 CreatedUtc = DateTime.UtcNow
             };
 
-            await _container.UpsertItemAsync(dto, new PartitionKey(dto.PartitionKey));
+            await _container.UpsertItemAsync(dto, new PartitionKey(documentIdString));
         }
 
         public async Task<ProcessingResult?> GetAsync(DocumentId documentId)
