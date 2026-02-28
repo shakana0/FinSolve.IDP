@@ -22,8 +22,7 @@ public static class DependencyInjection
         services.AddScoped<DocumentProcessingService>();
         services.AddScoped<DocumentFormatDetector>();
 
-        // Register factory as Singleton to manage the readers list
-        services.AddSingleton<DocumentReaderFactory>();
+        services.AddScoped<DocumentReaderFactory>();
 
         // Pipeline Services
         services.AddScoped<IdempotencyService>();
