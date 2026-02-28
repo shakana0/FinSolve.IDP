@@ -22,7 +22,7 @@ namespace FinSolve.IDP.Infrastructure.Cosmos
 
             var dto = new ProcessingResultCosmosDto
             {
-                id = documentIdString,
+                Id = documentIdString,
                 DocumentId = documentIdString,
                 PrimaryCategory = result.PrimaryCategory,
                 Items = result.Items.ToList(),

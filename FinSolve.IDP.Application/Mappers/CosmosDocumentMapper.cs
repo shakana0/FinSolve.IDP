@@ -10,7 +10,7 @@ namespace FinSolve.IDP.Application.Mappers
         {
             return new ProcessingResultCosmosDto
             {
-                id = result.DocumentId.Value.ToString(),
+                Id = result.DocumentId.Value.ToString(),
                 DocumentId = result.DocumentId.Value.ToString(),
                 PrimaryCategory = result.PrimaryCategory,
                 Items = result.Items.ToList(),
