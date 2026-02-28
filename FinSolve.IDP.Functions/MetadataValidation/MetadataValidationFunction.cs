@@ -91,13 +91,27 @@ public class MetadataValidationFunction
 
     private string? ExtractBlobPath(JsonElement eventGridEvent)
     {
+        string? rawPath = null;
+
         if (eventGridEvent.TryGetProperty("data", out var dataProp) &&
             dataProp.TryGetProperty("url", out var urlProp))
-            return urlProp.GetString();
+        {
+            rawPath = urlProp.GetString();
+        }
 
-        if (eventGridEvent.TryGetProperty("subject", out var subjectProp))
-            return subjectProp.GetString();
+        else if (eventGridEvent.TryGetProperty("subject", out var subjectProp))
+        {
+            rawPath = subjectProp.GetString();
+        }
 
-        return null;
+        if (string.IsNullOrEmpty(rawPath)) return null;
+
+        if (rawPath.StartsWith("http"))
+        {
+            var uri = new Uri(rawPath);
+            return uri.AbsolutePath.TrimStart('/');
+        }
+
+        return rawPath;
     }
 }
