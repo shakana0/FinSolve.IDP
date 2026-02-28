@@ -4,6 +4,7 @@ using FinSolve.IDP.Application.Services.Idempotency;
 using FinSolve.IDP.Application.Services.Pdf;
 using FinSolve.IDP.Application.Services.Summery;
 using FinSolve.IDP.Domain.Interfaces;
+using FinSolve.IDP.Domain.Readers;
 using Microsoft.Extensions.DependencyInjection;
 
 
@@ -13,19 +14,27 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddApplicationServices(this IServiceCollection services)
     {
-        // Metadata Extraction
+        // Metadata & Validation
         services.AddScoped<MetadataExtractionService>();
         services.AddScoped<IDocumentValidator, DocumentValidator>();
 
         // Document Processing
         services.AddScoped<DocumentProcessingService>();
         services.AddScoped<DocumentFormatDetector>();
-        services.AddScoped<DocumentReaderFactory>();
+
+        // Register factory as Singleton to manage the readers list
+        services.AddSingleton<DocumentReaderFactory>();
 
         // Pipeline Services
-        services.AddScoped<IdempotencyService, IdempotencyService>();
+        services.AddScoped<IdempotencyService>();
         services.AddScoped<PdfGenerationService>();
         services.AddScoped<SummaryGeneratorService>();
+
+        // Register all readers as IDocumentReader for IEnumerable injection
+        services.AddSingleton<IDocumentReader, TxtDocumentReader>();
+        services.AddSingleton<IDocumentReader, CsvDocumentReader>();
+        services.AddSingleton<IDocumentReader, PdfDocumentReader>();
+        services.AddSingleton<IDocumentReader, DocxDocumentReader>();
 
         return services;
     }
