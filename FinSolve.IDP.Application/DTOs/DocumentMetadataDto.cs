@@ -1,11 +1,13 @@
 ﻿using System.Text.Json;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.Json.Serialization;
 
 namespace FinSolve.IDP.Application.DTOs
 {
     public class DocumentMetadataDto
     {
+        [JsonPropertyName("documentId")]
         public string? DocumentId { get; set; }
         public string? FileName { get; set; }
         public string? UploadedBy { get; set; }

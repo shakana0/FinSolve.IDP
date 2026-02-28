@@ -1,7 +1,10 @@
-﻿namespace FinSolve.IDP.Application.DTOs;
+﻿using System.Text.Json.Serialization;
+
+namespace FinSolve.IDP.Application.DTOs;
 
 public class DocumentStatusDto
 {
+    [JsonPropertyName("documentId")]
     public string DocumentId { get; set; } = default!;
     public string Status { get; set; } = default!;
     public string PdfBlobPath { get; set; } = default!;

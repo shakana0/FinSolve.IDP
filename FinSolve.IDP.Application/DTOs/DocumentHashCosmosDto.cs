@@ -1,8 +1,12 @@
-﻿namespace FinSolve.IDP.Application.DTOs
+﻿using System.Text.Json.Serialization;
+
+namespace FinSolve.IDP.Application.DTOs
 {
     public class DocumentHashCosmosDto
     {
-        public string id { get; set; } = default!;
+        [JsonPropertyName("id")]
+        public string Id { get; set; } = default!;
+        [JsonPropertyName("documentId")]
         public string DocumentId { get; set; } = default!;
         public string Hash { get; set; } = default!;
     }
