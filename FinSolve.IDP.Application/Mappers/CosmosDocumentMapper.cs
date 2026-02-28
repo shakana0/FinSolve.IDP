@@ -15,7 +15,6 @@ namespace FinSolve.IDP.Application.Mappers
                 PrimaryCategory = result.PrimaryCategory,
                 Items = result.Items.ToList(),
                 Summary = result.Summary,
-                PartitionKey = result.DocumentId.Value.ToString(),
                 CreatedUtc = DateTime.UtcNow
             };
         }
