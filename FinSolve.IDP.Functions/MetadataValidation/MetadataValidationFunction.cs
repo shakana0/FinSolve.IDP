@@ -46,6 +46,7 @@ public class MetadataValidationFunction
         var fileName = Path.GetFileName(blobPath);
         using Stream fileStream = await _blobStorage.DownloadStreamAsync(blobPath);
 
+        _logger.LogInformation($"Processing file: {fileName} with path: {blobPath}");
         // 1. Extract metadata
         var domainMetadata = await _metadataService.ExtractAsync(fileName, fileStream);
 
