@@ -40,7 +40,7 @@ namespace FinSolve.IDP.Infrastructure.Cosmos
                 Hash = hash.Value
             };
 
-            await _container.UpsertItemAsync(dto, new PartitionKey(hash.Value));
+            await _container.UpsertItemAsync(dto, new PartitionKey(dto.DocumentId));
         }
     }
 }
