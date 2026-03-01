@@ -27,7 +27,7 @@ var host = new HostBuilder()
 
             if (string.IsNullOrEmpty(keyVaultUrl))
             {
-                throw new InvalidOperationException("Konfigurationsvärdet 'KeyVaultUri' saknas i appsettings eller miljövariabler.");
+                throw new InvalidOperationException("The configuration value 'KeyVaultUri' is missing from app settings or environment variables.");
             }
 
             return new KeyVaultSecretProvider(keyVaultUrl);
