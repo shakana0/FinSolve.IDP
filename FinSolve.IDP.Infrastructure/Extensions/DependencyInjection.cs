@@ -91,7 +91,6 @@ public static class DependencyInjection
         services.AddSingleton<IMessagePublisher, ServiceBusMessagePublisher>();
         services.AddScoped<IMetadataExtractor, PdfContentExtractor>();
         services.AddSingleton<IReportGenerator, QuestPdfGenerator>();
-        services.AddSingleton<IKeyVaultSecretProvider, KeyVaultSecretProvider>();
         services.AddSingleton<ILoggingAdapter, ApplicationInsightsLogger>();
 
         return services;
