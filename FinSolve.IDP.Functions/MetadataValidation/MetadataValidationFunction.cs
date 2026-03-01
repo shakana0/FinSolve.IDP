@@ -36,13 +36,15 @@ public class MetadataValidationFunction
         _logger.LogInformation("MetadataValidationFunction triggered via Event Grid");
 
         string? blobPath = ExtractBlobPath(eventGridEvent);
-        _logger.LogInformation($"Attempting to download blob from path: {blobPath}");
 
         if (string.IsNullOrEmpty(blobPath))
         {
             _logger.LogError("Could not extract blobPath from EventGridSchema");
             return;
         }
+
+        blobPath = Uri.UnescapeDataString(blobPath);
+        _logger.LogInformation($"Attempting to download blob from path: {blobPath}");
 
         var fileName = Path.GetFileName(blobPath);
         using Stream fileStream = await _blobStorage.DownloadStreamAsync(blobPath);
