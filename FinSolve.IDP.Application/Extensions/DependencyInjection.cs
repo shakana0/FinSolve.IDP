@@ -14,15 +14,17 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddApplicationServices(this IServiceCollection services)
     {
-        // Metadata & Validation
-        services.AddScoped<MetadataExtractionService>();
-        services.AddScoped<IDocumentValidator, DocumentValidator>();
-
-        // Document Processing
-        services.AddScoped<DocumentProcessingService>();
+        // 1. Register Detector first
         services.AddScoped<DocumentFormatDetector>();
 
+        // 2. Register Factory (required by MetadataExtractionService)
         services.AddScoped<DocumentReaderFactory>();
+
+        // 3. Register Validator
+        services.AddScoped<IDocumentValidator, DocumentValidator>();
+
+        // 4. Register Service (requested by your Azure Function)
+        services.AddScoped<MetadataExtractionService>();
 
         // Pipeline Services
         services.AddScoped<IdempotencyService>();
