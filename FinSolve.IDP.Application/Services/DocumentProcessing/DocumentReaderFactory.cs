@@ -20,23 +20,29 @@ namespace FinSolve.IDP.Application.Services.DocumentProcessing
 
         public IDocumentReader GetReader(DocumentType type)
         {
-            _logger.LogInformation($"Factory attempting to find reader for: {type}. Available readers: {string.Join(", ", _readers.Select(r => r.GetType().Name))}");
+            _logger.LogInformation($"Factory received {_readers.Count()} total readers from DI. Attempting to find match for: {type}");
+            _logger.LogInformation($"Available types: {string.Join(", ", _readers.Select(r => r.GetType().Name))}");
 
             var reader = type switch
             {
-                // We cast to (IDocumentReader) to help the compiler find the best type for the switch
-                DocumentType.Txt => (IDocumentReader?)_readers.OfType<TxtDocumentReader>().FirstOrDefault(),
-                DocumentType.Csv => _readers.OfType<CsvDocumentReader>().FirstOrDefault(),
-                DocumentType.Pdf => _readers.OfType<PdfDocumentReader>().FirstOrDefault(),
-                DocumentType.Docx => _readers.OfType<DocxDocumentReader>().FirstOrDefault(),
+                DocumentType.Txt => _readers.OfType<TxtDocumentReader>().FirstOrDefault() as IDocumentReader,
+                DocumentType.Csv => _readers.OfType<CsvDocumentReader>().FirstOrDefault() as IDocumentReader,
+                DocumentType.Pdf => _readers.OfType<PdfDocumentReader>().FirstOrDefault() as IDocumentReader,
+                DocumentType.Docx => _readers.OfType<DocxDocumentReader>().FirstOrDefault() as IDocumentReader,
 
                 DocumentType.Json => throw new UnsupportedFormatException("JSON reader is not yet implemented"),
                 DocumentType.Unknown => throw new UnsupportedFormatException("Cannot process document of unknown type"),
-
                 _ => throw new UnsupportedFormatException($"No reader defined for {type}")
             };
-            // If reader is null, it means the dependency was not registered in DI
-            return reader ?? throw new UnsupportedFormatException($"No reader registered in DI for {type}");
+
+            if (reader == null)
+            {
+                var errorMsg = $"No reader registered in DI for {type}. Ensure it is added in DependencyInjection.cs";
+                _logger.LogError(errorMsg);
+                throw new UnsupportedFormatException(errorMsg);
+            }
+
+            return reader!;
         }
     }
 }
