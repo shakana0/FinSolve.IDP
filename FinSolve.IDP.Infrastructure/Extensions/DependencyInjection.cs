@@ -3,7 +3,6 @@ using FinSolve.IDP.Application.Interfaces;
 using FinSolve.IDP.Infrastructure.Blob;
 using FinSolve.IDP.Infrastructure.Cosmos;
 using FinSolve.IDP.Infrastructure.Messaging;
-using FinSolve.IDP.Infrastructure.KeyVault;
 using FinSolve.IDP.Infrastructure.Telemetry;
 using FinSolve.IDP.Infrastructure.Dependencies.Cosmos;
 using FinSolve.IDP.Infrastructure.Pdf;
@@ -20,7 +19,7 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration config)
     {
-        // 1. Hämta alla värden med "dual-lookup" (både : och __)
+
         var sbNamespace = config["ServiceBusConnection:fullyQualifiedNamespace"] ?? config["ServiceBusConnection__fullyQualifiedNamespace"]
             ?? throw new InvalidOperationException("DEBUG: Missing ServiceBusConnection");
 
@@ -30,7 +29,7 @@ public static class DependencyInjection
         var cosmosEndpoint = config["CosmosDbAccountEndpoint"]
             ?? throw new InvalidOperationException("DEBUG: Missing CosmosDbAccountEndpoint");
 
-        // HÄR ÄR FIXEN: Kolla båda formaten för Cosmos
+
         var cosmosDbName = config["Cosmos:Database"] ?? config["Cosmos__Database"]
             ?? throw new InvalidOperationException("DEBUG: Missing Cosmos__Database in App Settings");
 
@@ -44,7 +43,14 @@ public static class DependencyInjection
             ?? throw new InvalidOperationException("DEBUG: Missing Cosmos__DlqContainer");
 
 
-        services.AddSingleton(sp => new CosmosClient(cosmosEndpoint, new DefaultAzureCredential()));
+        services.AddSingleton(sp => new CosmosClient(cosmosEndpoint, new DefaultAzureCredential(),
+            new CosmosClientOptions
+            {
+                SerializerOptions = new CosmosSerializationOptions
+                {
+                    PropertyNamingPolicy = CosmosPropertyNamingPolicy.CamelCase
+                }
+            }));
 
         services.AddSingleton<IDocumentHashRepository>(sp =>
         {
