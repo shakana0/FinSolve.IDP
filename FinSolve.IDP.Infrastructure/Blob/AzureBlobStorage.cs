@@ -48,17 +48,11 @@ namespace FinSolve.IDP.Infrastructure.Blob
 
         public async Task<Stream> DownloadStreamAsync(string blobPath)
         {
-            BlobClient blobClient;
+            string fileName = Uri.TryCreate(blobPath, UriKind.Absolute, out var uri)
+                ? Path.GetFileName(uri.LocalPath)
+                : Path.GetFileName(blobPath);
 
-            if (Uri.TryCreate(blobPath, UriKind.Absolute, out var uri))
-            {
-                blobClient = new BlobClient(uri, new DefaultAzureCredential());
-            }
-            else
-            {
-                blobClient = _container.GetBlobClient(blobPath);
-            }
-
+            var blobClient = _container.GetBlobClient(fileName);
             return await blobClient.OpenReadAsync();
         }
 
