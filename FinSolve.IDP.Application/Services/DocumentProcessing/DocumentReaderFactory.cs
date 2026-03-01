@@ -2,20 +2,26 @@
 using FinSolve.IDP.Domain.Interfaces;
 using FinSolve.IDP.Domain.Readers;
 using FinSolve.IDP.Domain.Exceptions;
+using FinSolve.IDP.Application.Interfaces;
 
 namespace FinSolve.IDP.Application.Services.DocumentProcessing
 {
     public class DocumentReaderFactory
     {
         private readonly IEnumerable<IDocumentReader> _readers;
+        private readonly ILoggingAdapter _logger;
 
-        public DocumentReaderFactory(IEnumerable<IDocumentReader> readers)
+
+        public DocumentReaderFactory(IEnumerable<IDocumentReader> readers, ILoggingAdapter logger)
         {
             _readers = readers;
+            _logger = logger;
         }
 
         public IDocumentReader GetReader(DocumentType type)
         {
+            _logger.LogInformation($"Factory attempting to find reader for: {type}. Available readers: {string.Join(", ", _readers.Select(r => r.GetType().Name))}");
+
             var reader = type switch
             {
                 // We cast to (IDocumentReader) to help the compiler find the best type for the switch
