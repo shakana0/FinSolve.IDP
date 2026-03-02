@@ -3,14 +3,16 @@
   "logging": {
     "applicationInsights": {
       "samplingSettings": {
-        "isEnabled": false
+        "isEnabled": true,
+        "excludedTypes": "Request",
+        "initialSamplingPercentage": 5.0
       }
     },
     "logLevel": {
       "default": "Information",
-      "Function": "Information",
       "Microsoft": "Warning",
-      "Host.Results": "Information"
+      "Function": "Information",
+      "Host.Aggregator": "Information"
     }
   }
 }
