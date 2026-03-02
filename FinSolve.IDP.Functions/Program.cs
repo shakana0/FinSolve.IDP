@@ -42,13 +42,13 @@ var host = new HostBuilder()
 
         services.ConfigureFunctionsApplicationInsights();
 
-        // Sampling
-        // services.Configure<TelemetryConfiguration>(config =>
-        // {
-        //     var builder = config.DefaultTelemetrySink.TelemetryProcessorChainBuilder;
-        //     builder.UseSampling(5.0);
-        //     builder.Build();
-        // });
+        //Sampling
+        services.Configure<TelemetryConfiguration>(config =>
+        {
+            var builder = config.DefaultTelemetrySink.TelemetryProcessorChainBuilder;
+            builder.UseSampling(5.0);
+            builder.Build();
+        });
 
     })
     .Build();
