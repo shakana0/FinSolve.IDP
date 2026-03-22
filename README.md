@@ -86,20 +86,9 @@ The system is built on a **Consumption-based** model.
 The FinSolve IDP is designed as a high-scale, asynchronous pipeline. By moving away from traditional polling and monolithic processing, we achieve a system that is both resilient to spikes and extremely cost-efficient.
 System Flow (Visualized)
 
-flowchart LR
-Client[User/Client] -- Upload --> Blob[Azure Blob Storage]
-Blob -- Event --> EG[Azure Event Grid]
-EG -- Trigger --> F1[Function #1: Metadata & Validation]
-F1 -- Queue Message --> SB[Azure Service Bus]
-SB -- Trigger --> F2[Function #2: Heavy Document Processing]
-F2 -- Persistence --> DB[(Cosmos DB / SQL)]
-F2 -- HTTP Callback --> LA[Logic App: Notification]
-LA -- Alert --> Email[Email/Teams]
+Flowchart LR
 
-    subgraph Reliability
-        SB -- Failure --> DLQ[Dead-Letter Queue]
-        DLQ -- Trigger --> F5[Function #5: DLQ Handler]
-    end
+<img src="./assets/imgs/fr.png" width="500" heigt="500" alt="Architecure of the evet-driven pipeline" />
 
 > **Technical Deep Dive:** For a granular look at the idempotency logic, scaling strategies, and component breakdowns, see our **[Full Architecture Guide](docs/ARCHITECTURE.md)**.
 
