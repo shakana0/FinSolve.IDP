@@ -78,3 +78,52 @@ az deployment group create \
   --resource-group <your-rg-name> \
   --template-file ./deployment/main.bicep \
   --parameters prefix=finsolve env=dev
+```
+
+### 2. Local Configuration
+Create a `local.settings.json` in the function directory:
+
+```diff
+ {
+   "IsEncrypted": false,
+   "Values": {
+     "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+     "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
++    "ServiceBusConnection__fullyQualifiedNamespace": "<your-bus>.servicebus.windows.net",
++    "CosmosDbAccountEndpoint": "<your-cosmos-endpoint>",
++    "KeyVaultUri": "https://<your-vault>.vault.azure.net/"
+   }
+ }
+```
+
+### 3. Run the Application
+```bash
+cd FinSolve.IDP.Application
+func start
+```
+---
+
+## 🎯 Project Governance & Strategy
+_This project is documented to reflect a professional Enterprise environment._
+
+| Pillar | Key Focus | Documentation |
+| :--- | :--- | :--- |
+| **Requirements** | FR/NFR, Scalability (10k docs), Success Metrics. | [**Requirements Spec**](docs/REQUIREMENTS.md) |
+| **Architecture** | Component roles, Idempotency, and Logic flow. | [**Technical Deep Dive**](docs/ARCHITECTURE.md) |
+| **Infrastructure** | Modular Bicep, RBAC, and Resource Layers. | [**Infrastructure Spec**](docs/INFRASTRUCTURE.md) |
+| **DevOps** | GitHub Actions, OIDC, and Environment Parity. | [**Workflow Guide**](docs/WORKFLOW.md) |
+| **FinOps** | $0 Idle cost, Serverless-First, Consumption Tiers. | [**Cost Strategy**](docs/STRATEGY.md) |
+
+---
+
+## 💰 FinOps: The Consumption-First Strategy
+This architecture is engineered for **Zero Waste**. By utilizing a 100% consumption-based model, the infrastructure cost scales linearly with the workload.
+
+- **Azure Functions (Y1):** Scaled to zero when idle.
+- **Cosmos DB Serverless:** No provisioned RU/s — pay only for actual operations.
+- **App Insights:** Smart sampling (5%) to balance observability and ingestion costs.
+
+> [!NOTE]
+> **Why this matters:** By defining **NFR-5 (Fault Tolerance)** before writing code, the system was built with Dead-Letter Queues (DLQ) from day one, ensuring no financial data is ever lost.
+
+---
