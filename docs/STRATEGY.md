@@ -17,7 +17,7 @@ The manual handling of financial documents is slow, error-prone, and expensive. 
 | ID | Requirement | Description |
 | :--- | :--- | :--- |
 | **FR-1** | **Automated Ingestion** | Trigger a processing workflow automatically upon file upload to Azure Blob Storage. |
-| **FR-2** | **Metadata Validation** | Validate file type (PDF/TXT/JSON/CSV/DOCS) and size before further processing. |
+| **FR-2** | **Metadata Validation** | Validate file type (PDF/TXT/JSON/CSV/DOCX) and size before further processing. |
 | **FR-3** | **Idempotent Processing** | Detect duplicate uploads using SHA-256 hashing to prevent redundant compute costs. |
 | **FR-4** | **Async Orchestration** | Decouple processing steps via a message broker (Service Bus) for independent scaling. |
 | **FR-5** | **Persistence** | Store extracted data and document status in a schema-less database (Cosmos DB). |
