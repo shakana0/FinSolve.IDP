@@ -98,7 +98,7 @@ Create a `local.settings.json` in the function directory:
 
 ### 3. Run the Application
 ```bash
-cd FinSolve.IDP.Application
+cd FinSolve.IDP.Functions
 func start
 ```
 ---
