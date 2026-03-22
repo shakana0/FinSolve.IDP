@@ -35,21 +35,9 @@ _How the system transforms manual labor into a high-efficiency, low-cost pipelin
 > **Architecture Walkthrough:** Below is the high-level flow of the FinSolve IDP. By moving away from traditional polling and monolithic processing, we achieve a system that is both resilient to spikes and extremely cost-efficient.
 
 
-flowchart LR
-Client[User/Client] -- Upload --> Blob[Azure Blob Storage]
-Blob -- Event --> EG[Azure Event Grid]
-EG -- Trigger --> F1[Function #1: Metadata & Validation]
-F1 -- Queue Message --> SB[Azure Service Bus]
-SB -- Trigger --> F2[Function #2: Heavy Document Processing]
-F2 -- Persistence --> DB[(Cosmos DB / SQL)]
-F2 -- HTTP Callback --> LA[Logic App: Notification]
-LA -- Alert --> Email[Email/Teams]
+Flowchart LR
+![FR](/assets/imgs/Decision%20Path%20Selection%20Flow-2026-01-15-124635.png)
 
-    subgraph Reliability
-        SB -- Failure --> DLQ[Dead-Letter Queue]
-        DLQ -- Trigger --> F5[Function #5: DLQ Handler]
-    end
-    ´
 ---
 
 ## 🎯 Project Governance & Strategy
