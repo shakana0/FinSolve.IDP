@@ -15,130 +15,66 @@
   <img src="https://img.shields.io/badge/FinOps-Optimized-brightgreen" alt="FinOps">
 </p>
 
+<p align="center">
+  <a href="docs/REQUIREMENTS.md">📋 Requirements</a> | 
+  <a href="docs/ARCHITECTURE.md">🏗️ Architecture</a> | 
+  <a href="docs/INFRASTRUCTURE.md">🛠️ Infrastructure</a> | 
+  <a href="docs/WORKFLOW.md">🚀 Workflow</a> | 
+  <a href="docs/STRATEGY.md">🎯 Strategy</a>
+</p>
+
 ---
 
 ## 📈 System Performance & FinOps Impact
-
 _How the system transforms manual labor into a high-efficiency, low-cost pipeline._
 
-| Metric                | Manual Processing | FinSolve IDP        | Improvement       |
-| :-------------------- | :---------------- | :------------------ | :---------------- |
-| **Time per Document** | ~5-10 mins        | **< 10 seconds**    | **98% reduction** |
-| **Cost per 1k Docs**  | $$$ (Labor)       | **~1.30 SEK**       | **Fractional**    |
-| **Availability**      | Working hours     | **24/7 Serverless** | **Infinite**      |
+| Metric | Manual Processing | FinSolve IDP | Improvement |
+| :--- | :--- | :--- | :--- |
+| **Time per Document** | ~5-10 mins | **< 10 seconds** | **98% reduction** |
+| **Cost per 1k Docs** | $$$ (Labor) | **~1.30 SEK** | **Fractional** |
+| **Availability** | Working hours | **24/7 Serverless** | **Infinite** |
 
 ---
 
 ## 🏗️ The Event-Driven Pipeline (Visualized)
-
 > [!TIP]
 > **Architecture Walkthrough:** Below is the high-level flow of the FinSolve IDP. By moving away from traditional polling and monolithic processing, we achieve a system that is both resilient to spikes and extremely cost-efficient.
 
-
-Flowchart LR
-![FR](/assets/imgs/Decision%20Path%20Selection%20Flow-2026-01-15-124635.png)
-
----
-
-## 🎯 Project Governance & Strategy
-
-_As a Senior Architect, I believe that high-quality systems start with rigorous planning. This project is documented to reflect a professional Enterprise environment._
-
-| Pillar           | Key Focus                                                 | Documentation                                                              |
-| :--------------- | :-------------------------------------------------------- | :------------------------------------------------------------------------- |
-| **Requirements** | FR/NFR, Scalability (10k docs), Success Metrics.          | [**Requirements Spec**](docs/REQUIREMENTS.md)                              |
-| **FinOps**       | $0 Idle cost, Serverless-First, Consumption Tiers.        | [**Cost Strategy**](docs/STRATEGY.md#1-finops-cost-optimization-strategy)  |
-| **Resiliency**   | Dead-Letter Queues, Idempotency (SHA-256), Load Leveling. | [**Risk Analysis**](docs/STRATEGY.md#2-risk-mitigation--system-resiliency) |
-
+<p align="center">
+  <img src="./assets/imgs/Decision Path Selection Flow-2026-01-15-124635.png" width="800" alt="Architecture of the event-driven pipeline" />
+</p>
 
 ---
 
-## 📊 Requirement Highlights (Enterprise Simulation)
-
-To bridge the gap between business needs and technical execution, the project follows a strict requirement trace:
-
-- **Functional (FR):** Automated ingestion via Event Grid, Async orchestration with Service Bus Topics, and Persistence in Cosmos DB.
-- **Non-Functional (NFR):** Zero-Trust Security via **Managed Identity**, < 10s E2E latency, and 100% Infrastructure-as-Code.
-
-> [!TIP]
-> **Why this matters:** By defining **NFR-5 (Fault Tolerance)** before writing a single line of code, the system was built with Dead-Letter Queues (DLQ) from day one, ensuring no financial data is ever lost.
-
----
-
-## 🧠 Architectural Deep Dive
-
+## 🧠 Architectural Core Principles
 > "As a Senior Engineer, I don't just build features; I architect solutions for scale, reliability, and cost-efficiency."
 
 ### 1. Event-Driven Orchestration
-
 We use **Azure Service Bus** as a managed buffer between ingestion and heavy processing. This prevents "Function Overload" and ensures that spikes in traffic don't lead to dropped messages or billing spikes.
 
-### 2. FinOps: The 44-SEK-per-month Strategy
-
-The system is built on a **Consumption-based** model.
-
-- **Zero Idle Cost:** We pay nothing when the system isn't running.
-- **Smart Sampling:** Application Insights is tuned to 5% sampling to keep observability high and costs low.
-- **Managed Identity:** Zero-trust security without the cost overhead of Key Vault per-secret retrieval.
----
-
-🏗️ How It Works: The Event-Driven Pipeline
-The FinSolve IDP is designed as a high-scale, asynchronous pipeline. By moving away from traditional polling and monolithic processing, we achieve a system that is both resilient to spikes and extremely cost-efficient.
-System Flow (Visualized)
-
-Flowchart LR
-
-<img src="./assets/imgs/fr.png" width="500" heigt="500" alt="Architecure of the evet-driven pipeline" />
-
-> **Technical Deep Dive:** For a granular look at the idempotency logic, scaling strategies, and component breakdowns, see our **[Full Architecture Guide](docs/ARCHITECTURE.md)**.
-
----
-
-## 🏗️ Infrastructure as Code (Bicep)
-
-The entire cloud ecosystem is defined as code using **Azure Bicep**, ensuring 100% reproducible environments and eliminating "Configuration Drift."
-
+### 2. Zero-Trust Infrastructure (Bicep)
+The entire ecosystem is defined via **Azure Bicep**, ensuring 100% reproducible environments.
+- **Identity-Driven:** Uses **Managed Identities**—no connection strings or keys are stored in the code.
 - **Modular Design:** Decoupled modules for Networking, Compute, Messaging, and Storage.
-- **Security First:** Zero-trust architecture using **Managed Identities**—no connection strings or keys are stored in the code.
-- **Environment Parity:** Parameter-driven deployments for `dev`, `test`, and `prod` environments.
 
-> **Deployment Deep Dive:** For a full breakdown of the resource graphing, dependency management, and security implementation, see our **[Infrastructure Guide](docs/INFRASTRUCTURE.md)**.
-
----
-
-## 🚀 CI/CD & Automation
-
-The project implements a robust **GitHub Actions** pipeline that synchronizes infrastructure state with application deployment.
-
-- **Unified Deployment:** A consolidated workflow ensures that Bicep templates are validated and provisioned before the .NET application code is deployed.
-- **OIDC Security:** Uses OpenID Connect (OIDC) for Azure authentication, eliminating the need for long-lived service principal secrets.
-- **Environment Integrity:** Automated builds and tests ensure that only high-quality code reaches the `main` branch.
-
-> **DevOps Deep Dive:** Explore the pipeline stages, security handshake, and deployment logic in the **[Workflow Guide](docs/WORKFLOW.md)**.
+### 3. CI/CD & Automation
+A robust **GitHub Actions** pipeline synchronizes infrastructure state with application deployment.
+- **OIDC Security:** Uses OpenID Connect for Azure authentication, eliminating long-lived secrets.
+- **Environment Integrity:** Automated builds ensure only high-quality code reaches `main`.
 
 ---
 
-## 💰 FinOps & Cost Strategy
+## 🏁 Getting Started
 
-This architecture is engineered for **Zero Waste**. By utilizing a 100% consumption-based model, the infrastructure scales its cost linearly with the workload.
+### Prerequisites
+* **Azure CLI** & **Bicep CLI**
+* **.NET 10 SDK** (Isolated Worker)
+* **Azure Functions Core Tools** (for local debugging)
 
-- **Azure Functions (Y1):** Scaled to zero when idle.
-- **Cosmos DB Serverless:** No provisioned RU/s — pay only for actual operations.
-- **Application Insights:** Smart sampling (5%) to balance observability and ingestion costs.
-
-**[Read the full Strategic Deep Dive →](docs/STRATEGY.md)**
-
----
-
-## 📖 Project Documentation
-
-_Deep dives into the architectural, strategic, and operational layers of the FinSolve IDP._
-
-| Document                                        | Description                                                             | Key Artifacts                             |
-| :---------------------------------------------- | :---------------------------------------------------------------------- | :---------------------------------------- |
-| [**📋 Requirements**](docs/REQUIREMENTS.md)     | Business goals, Functional (FR) and Non-Functional (NFR) specs.         | User Stories, Scalability targets.        |
-| [**🏗️ Architecture**](docs/ARCHITECTURE.md)     | Technical deep dive into the event-driven pipeline and component roles. | Mermaid diagrams, Idempotency logic.      |
-| [**🛠️ Infrastructure**](docs/INFRASTRUCTURE.md) | Full breakdown of the 7-layer Bicep modular system.                     | IaC, RBAC, Managed Identities.            |
-| [**🎯 Strategy & FinOps**](docs/STRATEGY.md)    | Cost optimization, Risk mitigation, and Architectural decisions.        | Consumption-tiers, DLQ, Load Leveling.    |
-| [**🚀 Workflow**](docs/WORKFLOW.md)             | DevOps lifecycle and CI/CD pipeline configuration.                      | GitHub Actions, OIDC, Environment parity. |
-```
+### 1. Infrastructure Deployment
+Deploy the foundational Azure resources using the provided Bicep templates:
+```bash
+az deployment group create \
+  --resource-group <your-rg-name> \
+  --template-file ./deployment/main.bicep \
+  --parameters prefix=finsolve env=dev
